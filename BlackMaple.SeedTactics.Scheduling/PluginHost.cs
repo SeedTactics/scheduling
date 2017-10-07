@@ -32,49 +32,52 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 using System;
-using System.Collections.Generic;
-using BlackMaple.MachineWatchInterface;
-using System.Runtime.Serialization;
+using System.Reflection;
+using Newtonsoft.Json;
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
-    [DataContract]
-    public class AllocateResult
+    public class PluginHost
     {
-        [DataMember]
-        public string ScheduleId { get; set; }
-        [DataMember]
-        public IEnumerable<JobPlan> Jobs { get; set; }
-        [DataMember]
-        public IEnumerable<SimulatedStationUtilization> SimStations { get; set; }
-        [DataMember]
-        public IEnumerable<string> NewScheduledOrders { get; set; }
-        [DataMember]
-        public IEnumerable<SeedOrders.ScheduledPartWithoutBooking> NewExtraParts { get; set; }
-    }
+        private readonly IAllocateInterface _allocate;
 
-    public struct FlexPlan
-    {
-        public Newtonsoft.Json.Linq.JObject FlexJson { get; set; }
-        public string MastModelFile { get; set; }
-    }
+        public PluginHost(string pluginDll)
+        {
+            var a = Assembly.LoadFrom(pluginDll);
+            foreach (var t in a.GetTypes())
+            {
+                foreach (var i in t.GetInterfaces())
+                {
+                    if (_allocate != null && i == typeof(IAllocateInterface))
+                    {
+                        _allocate = (IAllocateInterface)Activator.CreateInstance(t);
+                        return;
+                    }
+                }
+            }
+        }
 
-    [Serializable]
-    public enum BookingFillMethod
-    {
-        FillInAnyOrder,
-        FillOnlyByDueDate
-    }
-
-    public interface IAllocateInterface
-    {
-        AllocateResult Allocate(
-            SeedOrders.UnscheduledStatus bookings,
-            JobsAndExtraParts previousSchedule,
-            FlexPlan flexPlan,
+        public string Allocate(
+            string bookingsJson,
+            string previousScheduleJson,
+            string flexPlanJson,
             DateTime startLocal,
             DateTime endLocal,
             BookingFillMethod fillMethod,
-            string scheduleId);
+            string scheduleId)
+        {
+            var bookings = JsonConvert.DeserializeObject<SeedOrders.UnscheduledStatus>(bookingsJson);
+            var previousSchedule = JsonConvert.DeserializeObject<MachineWatchInterface.JobsAndExtraParts>(previousScheduleJson);
+            FlexPlan plan = default(FlexPlan);
+            if (flexPlanJson.StartsWith("{"))
+                plan.FlexJson = Newtonsoft.Json.Linq.JObject.Parse(flexPlanJson);
+            else
+                plan.MastModelFile = flexPlanJson;
+
+            var result = _allocate.Allocate(bookings, previousSchedule, plan, startLocal, endLocal, fillMethod, scheduleId);
+
+            return JsonConvert.SerializeObject(result);
+        }
+
     }
 }
