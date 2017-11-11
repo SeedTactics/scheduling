@@ -2,14 +2,16 @@
   <PropertyGroup>
     <AssemblyName>BlackMaple.SeedTactics.Scheduling</AssemblyName>
     <PackageId>BlackMaple.SeedTactics.Scheduling</PackageId>
-    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix>1.0.1</VersionPrefix>
 
     <Title>SeedTactics scheduling base library for plugins</Title>
     <Company>Black Maple Software, LLC</Company>
     <Product>SeedTactics</Product>
     <Copyright>Black Maple Software, LLC</Copyright>
     <Authors>John Lenz</Authors>
+    <PackageLicenseUrl>https://opensource.org/licenses/BSD-3-Clause</PackageLicenseUrl>
     <PackageProjectUrl>https://www.seedtactics.com</PackageProjectUrl>
+    <RepositoryURL>https://bitbucket.org/blackmaple/seedscheduling</RepositoryURL>
 
     <OutputType>Library</OutputType>
   </PropertyGroup>
