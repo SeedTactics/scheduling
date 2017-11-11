@@ -11,7 +11,8 @@
     <Authors>John Lenz</Authors>
     <PackageLicenseUrl>https://opensource.org/licenses/BSD-3-Clause</PackageLicenseUrl>
     <PackageProjectUrl>https://www.seedtactics.com</PackageProjectUrl>
-    <RepositoryURL>https://bitbucket.org/blackmaple/seedscheduling</RepositoryURL>
+    <RepositoryUrl>https://bitbucket.org/blackmaple/seedscheduling</RepositoryUrl>
+    <RepositoryType>hg</RepositoryType>
 
     <OutputType>Library</OutputType>
   </PropertyGroup>
