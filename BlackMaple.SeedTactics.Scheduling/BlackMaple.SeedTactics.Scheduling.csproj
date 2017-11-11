@@ -13,6 +13,13 @@
     <PackageProjectUrl>https://www.seedtactics.com</PackageProjectUrl>
     <RepositoryUrl>https://bitbucket.org/blackmaple/seedscheduling</RepositoryUrl>
     <RepositoryType>hg</RepositoryType>
+    <Description>
+      This package contains the scheduling plugin API for [OrderLink](https://www.seedtactics.com/products/seedtactic-orderlink).
+      A scheduling plugin takes the unscheduled bookings and the flexibility plan and produces the daily schedule to send
+      to the cell controller.
+
+      For documentation and source code, visit [the bitbucket project](https://bitbucket.org/blackmaple/seedscheduling).
+    </Description>
 
     <OutputType>Library</OutputType>
   </PropertyGroup>
