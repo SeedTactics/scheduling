@@ -91,6 +91,12 @@ namespace BlackMaple.SeedTactics.Scheduling
         ///Cell efficiency as a percentage between 0 and 1
         public double CellEfficiency {get;set;} = 1.0;
 
+        ///Travel time of the cart between two points (average)
+        public TimeSpan ExpectedCartTravelTime {get;set;} = TimeSpan.FromMinutes(1);
+
+        ///Time for a rotary swap from machine queue to machine worktable
+        public TimeSpan ExpectedRotarySwapTime {get;set;} = TimeSpan.FromMinutes(0.5);
+
         public string OriginalSeedtacticPlanningJson { get; set; }
         public string OriginalMastModelFileName { get; set; }
     }
