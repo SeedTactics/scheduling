@@ -89,7 +89,7 @@ namespace BlackMaple.SeedTactics.Scheduling
         public IList<FlexPart> Parts {get;} = new List<FlexPart>();
         
         ///Cell efficiency as a percentage between 0 and 1
-        public double CellEfficiency {get;} = 1.0;
+        public double CellEfficiency {get;set;} = 1.0;
 
         public string OriginalSeedtacticPlanningJson { get; set; }
         public string OriginalMastModelFileName { get; set; }
