@@ -27,7 +27,6 @@
   <ItemGroup>
     <PackageReference Include="BlackMaple.MachineWatchInterface" Version="3.11.*" />
     <PackageReference Include="BlackMaple.SeedOrders" Version="2.8.*" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
   </ItemGroup>
 
   <Choose>

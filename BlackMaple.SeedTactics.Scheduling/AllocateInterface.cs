@@ -34,29 +34,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Collections.Generic;
 using BlackMaple.MachineWatchInterface;
-using System.Runtime.Serialization;
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
-    [DataContract]
     public class AllocateResult
     {
-        [DataMember]
         public string ScheduleId { get; set; }
-        [DataMember]
         public IEnumerable<JobPlan> Jobs { get; set; }
-        [DataMember]
         public IEnumerable<SimulatedStationUtilization> SimStations { get; set; }
-        [DataMember]
         public IEnumerable<string> NewScheduledOrders { get; set; }
-        [DataMember]
         public IEnumerable<SeedOrders.ScheduledPartWithoutBooking> NewExtraParts { get; set; }
-    }
-
-    public struct FlexPlan
-    {
-        public Newtonsoft.Json.Linq.JObject FlexJson { get; set; }
-        public string MastModelFile { get; set; }
     }
 
     [Serializable]

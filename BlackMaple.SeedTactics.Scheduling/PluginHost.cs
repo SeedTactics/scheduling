@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 using System.Reflection;
-using Newtonsoft.Json;
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
@@ -57,6 +56,22 @@ namespace BlackMaple.SeedTactics.Scheduling
             }
         }
 
+        private static T DeserializeObject<T>(string json)
+        {
+            var s = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
+            var m = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(json));
+            return (T)s.ReadObject(m);
+        }
+
+        public static string SerializeObject<T>(T obj)
+        {
+            var s = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
+            var m = new System.IO.MemoryStream();
+            s.WriteObject(m, obj);
+            var bytes = m.ToArray();
+            return System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+        }
+
         public string Allocate(
             string bookingsJson,
             string previousScheduleJson,
@@ -66,17 +81,12 @@ namespace BlackMaple.SeedTactics.Scheduling
             BookingFillMethod fillMethod,
             string scheduleId)
         {
-            var bookings = JsonConvert.DeserializeObject<SeedOrders.UnscheduledStatus>(bookingsJson);
-            var previousSchedule = JsonConvert.DeserializeObject<MachineWatchInterface.JobsAndExtraParts>(previousScheduleJson);
-            FlexPlan plan = default(FlexPlan);
-            if (flexPlanJson.StartsWith("{"))
-                plan.FlexJson = Newtonsoft.Json.Linq.JObject.Parse(flexPlanJson);
-            else
-                plan.MastModelFile = flexPlanJson;
-
+            var bookings = DeserializeObject<SeedOrders.UnscheduledStatus>(bookingsJson);
+            var previousSchedule = DeserializeObject<MachineWatchInterface.JobsAndExtraParts>(previousScheduleJson);
+            var plan = DeserializeObject<FlexPlan>(flexPlanJson);
             var result = _allocate.Allocate(bookings, previousSchedule, plan, startLocal, endLocal, fillMethod, scheduleId);
 
-            return JsonConvert.SerializeObject(result);
+            return SerializeObject(result);
         }
 
     }
