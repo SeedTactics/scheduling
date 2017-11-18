@@ -8,7 +8,7 @@ build_script:
         dotnet pack -c Release /p:VersionPrefix=$ver
     } else {
         $suffix = "-pre" + $Env:APPVEYOR_BUILD_NUMBER
-        dotnet pack -c Debug /p:VersionPrefix=$ver --versionsuffix $suffix
+        dotnet pack -c Debug /p:VersionPrefix=$ver --version-suffix $suffix
     }
 artifacts:
 - path: '**/*.nupkg'
