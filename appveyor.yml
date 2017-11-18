@@ -1,0 +1,14 @@
+version: '{build}'
+image: Visual Studio 2017
+build_script:
+- ps: |
+    $ver = ./version-prefix.ps1
+    cd BlackMaple.SeedTactics.Scheduling
+    If ($Env:APPVEYOR_REPO_TAG == "true") {
+        dotnet pack -c Release /p:VersionPrefix=$ver
+    } else {
+        $suffix = "-pre" + $Env:APPVEYOR_BUILD_NUMBER
+        dotnet pack -c Debug /p:VersionPrefix=$ver --versionsuffix $suffix
+    }
+artifacts:
+- path: '**/*.nupkg'
