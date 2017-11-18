@@ -2,13 +2,13 @@ version: '{build}'
 image: Visual Studio 2017
 build_script:
 - ps: |
-    $ver = ./version-prefix.ps1
+    $ver = python version-prefix.py
     cd BlackMaple.SeedTactics.Scheduling
     If ($Env:APPVEYOR_REPO_TAG -eq "true") {
-        dotnet pack -c Release /p:VersionPrefix=$ver
+        dotnet pack -c Release /p:VersionPrefix=$ver --include-symbols
     } else {
-        $suffix = "-pre" + $Env:APPVEYOR_BUILD_NUMBER
-        dotnet pack -c Debug /p:VersionPrefix=$ver --version-suffix $suffix
+        $suffix = "pre" + ($Env:APPVEYOR_BUILD_NUMBER).PadLeft(4, '0')
+        dotnet pack -c Release /p:VersionPrefix=$ver --version-suffix $suffix --include-symbols
     }
 artifacts:
 - path: '**/*.nupkg'

@@ -2,7 +2,6 @@
   <PropertyGroup>
     <AssemblyName>BlackMaple.SeedTactics.Scheduling</AssemblyName>
     <PackageId>BlackMaple.SeedTactics.Scheduling</PackageId>
-    <VersionPrefix>1.1.0-pre01</VersionPrefix>
 
     <Title>SeedTactics scheduling base library for plugins</Title>
     <Company>Black Maple Software, LLC</Company>
