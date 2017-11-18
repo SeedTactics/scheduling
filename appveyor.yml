@@ -4,8 +4,7 @@ build_script:
 - ps: |
     $ver = python version-prefix.py
     cd BlackMaple.SeedTactics.Scheduling
-    $Env:APPVEYOR_REPO_TAG
-    If ($Env:APPVEYOR_REPO_TAG -eq "true") {
+    If ($(hg id -t -r '.^') -neq "") {
         dotnet pack -c Release /p:VersionPrefix=$ver --include-symbols
     } else {
         $suffix = "pre." + $Env:APPVEYOR_BUILD_NUMBER
