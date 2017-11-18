@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "pack",
+            "command": "dotnet pack /p:VersionPrefix=`python ../version-prefix.py` --include-symbols --version-suffix=alpha`date -u +%Y%m%d%H%M%S` -o ${workspaceFolder}/../nugetpackages",
+            "options": {
+                "cwd": "${workspaceFolder}/BlackMaple.SeedTactics.Scheduling"
+            },
+            "type": "shell",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

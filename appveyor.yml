@@ -7,7 +7,7 @@ build_script:
     If ($Env:APPVEYOR_REPO_TAG -eq "true") {
         dotnet pack -c Release /p:VersionPrefix=$ver --include-symbols
     } else {
-        $suffix = "pre" + ($Env:APPVEYOR_BUILD_NUMBER).PadLeft(4, '0')
+        $suffix = "pre." + $Env:APPVEYOR_BUILD_NUMBER
         dotnet pack -c Release /p:VersionPrefix=$ver --version-suffix $suffix --include-symbols
     }
 artifacts:
