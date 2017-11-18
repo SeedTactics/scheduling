@@ -1,5 +1,7 @@
 import subprocess
 
+# Script similar to GitVersion, but simplier and focused on our use case.
+
 curtag = subprocess.check_output(["hg", "id", "-t", "-r", ".^"])
 if curtag == "":
     print (curtag)
