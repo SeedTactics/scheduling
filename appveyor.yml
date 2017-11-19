@@ -14,9 +14,6 @@ build_script:
 
 artifacts:
 - path: '**/*.nupkg'
-  on:
-    branch: default
-    BMS_RELEASE_TO_NUGET: true
 
 deploy:
 - provider: NuGet
