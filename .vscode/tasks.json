@@ -3,7 +3,7 @@
     "tasks": [
         {
             "label": "pack",
-            "command": "dotnet pack /p:VersionPrefix=`python ../version-prefix.py` --include-symbols --version-suffix=alpha`date -u +%Y%m%d%H%M%S` -o ${workspaceFolder}/../nugetpackages",
+            "command": "dotnet pack /p:VersionPrefix=`hg id  -t -r 'ancestors(.) and tag()' | sed -r 's/([0-9]+)\\.([0-9]+)\\.([0-9]+)/echo \"\\1.\\2.$((\\3+1))\"/ge'` --include-symbols --version-suffix=alpha`date -u +%Y%m%d%H%M%S` -o ${workspaceFolder}/../nugetpackages",
             "options": {
                 "cwd": "${workspaceFolder}/BlackMaple.SeedTactics.Scheduling"
             },
