@@ -24,8 +24,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlackMaple.MachineWatchInterface" Version="3.11.*" />
-    <PackageReference Include="BlackMaple.SeedOrders" Version="2.8.*" />
+    <PackageReference Include="BlackMaple.MachineWatchInterface" Version="4.*" />
+    <PackageReference Include="BlackMaple.SeedOrders" Version="3.*" />
   </ItemGroup>
 
   <Choose>
