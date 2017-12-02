@@ -36,7 +36,7 @@ using System.Reflection;
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
-    public class PluginHost
+    public class PluginHost : MarshalByRefObject
     {
         private readonly IAllocateInterface _allocate;
 
@@ -47,7 +47,7 @@ namespace BlackMaple.SeedTactics.Scheduling
             {
                 foreach (var i in t.GetInterfaces())
                 {
-                    if (_allocate != null && i == typeof(IAllocateInterface))
+                    if (_allocate == null && i == typeof(IAllocateInterface))
                     {
                         _allocate = (IAllocateInterface)Activator.CreateInstance(t);
                         return;
