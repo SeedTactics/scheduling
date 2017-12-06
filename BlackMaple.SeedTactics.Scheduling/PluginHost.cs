@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace BlackMaple.SeedTactics.Scheduling
@@ -79,12 +80,17 @@ namespace BlackMaple.SeedTactics.Scheduling
             DateTime startLocal,
             DateTime endLocal,
             BookingFillMethod fillMethod,
-            string scheduleId)
+            string scheduleId,
+            string downtimesJson)
         {
             var bookings = DeserializeObject<SeedOrders.UnscheduledStatus>(bookingsJson);
             var previousSchedule = DeserializeObject<MachineWatchInterface.JobsAndExtraParts>(previousScheduleJson);
             var plan = DeserializeObject<FlexPlan>(flexPlanJson);
-            var result = _allocate.Allocate(bookings, previousSchedule, plan, startLocal, endLocal, fillMethod, scheduleId);
+            var downtimes = DeserializeObject<List<StationDowntime>>(downtimesJson);
+            var result = _allocate.Allocate(
+                bookings, previousSchedule, plan, startLocal,
+                endLocal, fillMethod, scheduleId,
+                downtimes);
 
             return SerializeObject(result);
         }
