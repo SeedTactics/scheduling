@@ -62,6 +62,7 @@ namespace BlackMaple.SeedTactics.Scheduling
             DateTime startLocal,
             DateTime endLocal,
             BookingFillMethod fillMethod,
-            string scheduleId);
+            string scheduleId,
+            IEnumerable<StationDowntime> downtimes);
     }
 }

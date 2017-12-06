@@ -77,9 +77,16 @@ namespace BlackMaple.SeedTactics.Scheduling
         public IList<FlexPath> Paths {get;} = new List<FlexPath>();
     }
 
+    public enum PartReadiness
+    {
+        ProductionReady,
+        ProveOutOnly
+    }
+
     public class FlexPart
     {
         public string Name {get;set;}
+        public PartReadiness Readiness {get;set;}
         public IList<FlexProcess> Processes {get;} = new List<FlexProcess>();
     }
 
