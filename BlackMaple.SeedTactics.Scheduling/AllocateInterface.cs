@@ -59,8 +59,8 @@ namespace BlackMaple.SeedTactics.Scheduling
             SeedOrders.UnscheduledStatus bookings,
             JobsAndExtraParts previousSchedule,
             FlexPlan flexPlan,
-            DateTime startLocal,
-            DateTime endLocal,
+            DateTime startUTC,
+            DateTime endUTC,
             BookingFillMethod fillMethod,
             string scheduleId,
             IEnumerable<StationDowntime> downtimes);

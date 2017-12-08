@@ -77,8 +77,8 @@ namespace BlackMaple.SeedTactics.Scheduling
             string bookingsJson,
             string previousScheduleJson,
             string flexPlanJson,
-            DateTime startLocal,
-            DateTime endLocal,
+            DateTime startUTC,
+            DateTime endUTC,
             BookingFillMethod fillMethod,
             string scheduleId,
             string downtimesJson)
@@ -88,8 +88,8 @@ namespace BlackMaple.SeedTactics.Scheduling
             var plan = DeserializeObject<FlexPlan>(flexPlanJson);
             var downtimes = DeserializeObject<List<StationDowntime>>(downtimesJson);
             var result = _allocate.Allocate(
-                bookings, previousSchedule, plan, startLocal,
-                endLocal, fillMethod, scheduleId,
+                bookings, previousSchedule, plan, startUTC,
+                endUTC, fillMethod, scheduleId,
                 downtimes);
 
             return SerializeObject(result);

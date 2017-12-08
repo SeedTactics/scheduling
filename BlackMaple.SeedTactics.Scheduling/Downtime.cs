@@ -39,14 +39,15 @@ namespace BlackMaple.SeedTactics.Scheduling
     ///Marks that a collection of stations is down for a given time period during the allocation.
     public class StationDowntime
     {
-        public TimeSpan OffsetFromStart { get; }
-        public TimeSpan DowntimeLength { get; }
+        public DateTime StartOfDowntimeUTC {get;set;}
+        public DateTime EndOfDowntimeUTC {get;set;}
+        ///An empty list means the entire cell - all stations
         public IReadOnlyCollection<FlexibilityStation> Station { get; }
 
-        public StationDowntime(TimeSpan offset, TimeSpan len, IReadOnlyCollection<FlexibilityStation> stat)
+        public StationDowntime(DateTime startUTC, DateTime endUTC, IReadOnlyCollection<FlexibilityStation> stat)
         {
-            OffsetFromStart = offset;
-            DowntimeLength = len;
+            StartOfDowntimeUTC = startUTC;
+            EndOfDowntimeUTC = endUTC;
             Station = stat;
         }
     }
