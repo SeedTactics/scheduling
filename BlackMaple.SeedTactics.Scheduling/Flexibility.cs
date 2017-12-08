@@ -49,8 +49,9 @@ namespace BlackMaple.SeedTactics.Scheduling
 
     public class FlexRouteStop
     {
+        public string MachineGroup {get;set;}
         public string Program {get;set;}
-        public HashSet<FlexibilityStation> Machines {get;} = new HashSet<FlexibilityStation>();
+        public HashSet<int> Machines {get;} = new HashSet<int>();
         public TimeSpan ExpectedCycleTime {get;set;}
     }
 
