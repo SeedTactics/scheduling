@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+
+    <Title>SeedTactics allocation cli helper</Title>
+    <Company>Black Maple Software, LLC</Company>
+    <Product>SeedTactics</Product>
+    <Copyright>Black Maple Software, LLC</Copyright>
+    <Authors>John Lenz</Authors>
+    <PackageLicenseUrl>https://opensource.org/licenses/BSD-3-Clause</PackageLicenseUrl>
+    <PackageProjectUrl>https://www.seedtactics.com</PackageProjectUrl>
+    <RepositoryUrl>https://bitbucket.org/blackmaple/seedscheduling</RepositoryUrl>
+    <RepositoryType>hg</RepositoryType>
+    <Description>
+      This package contains a utility program to help testing and analyzing
+      an allocation algorithm.  It is designed to be used from a jupyter notebook
+      to explore how an allocation algorithm performs for different inputs.
+
+      For documentation and source code, visit [the bitbucket project](https://bitbucket.org/blackmaple/seedscheduling).
+    </Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.*"/>
+    <PackageReference Include="BlackMaple.MachineWatchInterface" Version="5.*"/>
+    <PackageReference Include="BlackMaple.SeedOrders" Version="3.*" />
+    <PackageReference Include="CommandLineParser" Version="2.1.1-beta*" />
+    <ProjectReference Include="../BlackMaple.SeedTactics.Scheduling/BlackMaple.SeedTactics.Scheduling.csproj"/>
+  </ItemGroup>
+
+</Project>
