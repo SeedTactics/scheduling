@@ -54,22 +54,22 @@ namespace BlackMaple.SeedTactics.Scheduling
     {
         [DataMember] public string MachineGroup {get;set;}
         [DataMember] public string Program {get;set;}
-        [DataMember] public HashSet<int> Machines {get;} = new HashSet<int>();
+        [DataMember] public HashSet<int> Machines {get; private set;} = new HashSet<int>();
         [DataMember] public TimeSpan ExpectedCycleTime {get;set;}
     }
 
     [DataContract]
     public class FlexPath
     {
-        [DataMember] public HashSet<int> LoadStations {get;} = new HashSet<int>();
+        [DataMember] public HashSet<int> LoadStations {get; private set;} = new HashSet<int>();
         [DataMember] public TimeSpan ExpectedLoadTime {get;set;}
 
-        [DataMember] public IList<FlexRouteStop> Stops {get;} = new List<FlexRouteStop>();
+        [DataMember] public IList<FlexRouteStop> Stops {get; private set;} = new List<FlexRouteStop>();
 
-        [DataMember] public HashSet<int> UnloadStations {get;} = new HashSet<int>();
+        [DataMember] public HashSet<int> UnloadStations {get; private set;} = new HashSet<int>();
         [DataMember] public TimeSpan ExpectedUnloadTime {get;set;}
 
-        [DataMember] public HashSet<string> Pallets {get;} = new HashSet<string>();
+        [DataMember] public HashSet<string> Pallets {get; private set;} = new HashSet<string>();
 
         [DataMember] public string Fixture {get;set;}
         [DataMember] public int Face {get;set;}
@@ -80,7 +80,7 @@ namespace BlackMaple.SeedTactics.Scheduling
     public class FlexProcess
     {
         [DataMember] public int ProcessNumber {get;set;}
-        [DataMember] public IList<FlexPath> Paths {get;} = new List<FlexPath>();
+        [DataMember] public IList<FlexPath> Paths {get; private set;} = new List<FlexPath>();
     }
 
     [DataContract]
@@ -95,14 +95,14 @@ namespace BlackMaple.SeedTactics.Scheduling
     {
         [DataMember] public string Name {get;set;}
         [DataMember] public PartReadiness Readiness {get;set;}
-        [DataMember] public IList<FlexProcess> Processes {get;} = new List<FlexProcess>();
+        [DataMember] public IList<FlexProcess> Processes {get; private set;} = new List<FlexProcess>();
     }
 
     [DataContract]
     public class FlexPlan
     {
         ///All the parts in the flexibility plan
-        [DataMember] public IList<FlexPart> Parts {get;} = new List<FlexPart>();
+        [DataMember] public IList<FlexPart> Parts {get; private set;} = new List<FlexPart>();
 
         ///Cell efficiency as a percentage between 0 and 1
         [DataMember] public double CellEfficiency {get;set;} = 1.0;

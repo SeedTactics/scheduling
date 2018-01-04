@@ -44,7 +44,7 @@ namespace BlackMaple.SeedTactics.Scheduling
         [DataMember] public DateTime StartOfDowntimeUTC {get;set;}
         [DataMember] public DateTime EndOfDowntimeUTC {get;set;}
         ///An empty list means the entire cell - all stations
-        [DataMember] public IReadOnlyCollection<FlexibilityStation> Station { get; }
+        [DataMember] public IReadOnlyCollection<FlexibilityStation> Station { get; private set; }
 
         public StationDowntime(DateTime startUTC, DateTime endUTC, IReadOnlyCollection<FlexibilityStation> stat)
         {
