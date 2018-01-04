@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2017, John Lenz
+﻿/* Copyright (c) 2018, John Lenz
 
 All rights reserved.
 
@@ -34,23 +34,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Collections.Generic;
 using BlackMaple.MachineWatchInterface;
+using System.Runtime.Serialization;
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
+    [DataContract]
     public class AllocateResult
     {
-        public string ScheduleId { get; set; }
-        public IEnumerable<JobPlan> Jobs { get; set; }
-        public IEnumerable<SimulatedStationUtilization> SimStations { get; set; }
-        public IEnumerable<string> NewScheduledOrders { get; set; }
-        public IEnumerable<SeedOrders.ScheduledPartWithoutBooking> NewExtraParts { get; set; }
+        [DataMember] public string ScheduleId { get; set; }
+        [DataMember] public IEnumerable<JobPlan> Jobs { get; set; }
+        [DataMember] public IEnumerable<SimulatedStationUtilization> SimStations { get; set; }
+        [DataMember] public IEnumerable<string> NewScheduledOrders { get; set; }
+        [DataMember] public IEnumerable<SeedOrders.ScheduledPartWithoutBooking> NewExtraParts { get; set; }
     }
 
-    [Serializable]
+    [Serializable, DataContract]
     public enum BookingFillMethod
     {
-        FillInAnyOrder,
-        FillOnlyByDueDate
+        [EnumMember] FillInAnyOrder,
+        [EnumMember] FillOnlyByDueDate
     }
 
     public interface IAllocateInterface

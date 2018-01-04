@@ -1,4 +1,4 @@
-/* Copyright (c) 2017, John Lenz
+/* Copyright (c) 2018, John Lenz
 
 All rights reserved.
 
@@ -33,16 +33,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
     ///Marks that a collection of stations is down for a given time period during the allocation.
+    [DataContract]
     public class StationDowntime
     {
-        public DateTime StartOfDowntimeUTC {get;set;}
-        public DateTime EndOfDowntimeUTC {get;set;}
+        [DataMember] public DateTime StartOfDowntimeUTC {get;set;}
+        [DataMember] public DateTime EndOfDowntimeUTC {get;set;}
         ///An empty list means the entire cell - all stations
-        public IReadOnlyCollection<FlexibilityStation> Station { get; }
+        [DataMember] public IReadOnlyCollection<FlexibilityStation> Station { get; }
 
         public StationDowntime(DateTime startUTC, DateTime endUTC, IReadOnlyCollection<FlexibilityStation> stat)
         {

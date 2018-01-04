@@ -1,4 +1,4 @@
-/* Copyright (c) 2017, John Lenz
+/* Copyright (c) 2018, John Lenz
 
 All rights reserved.
 
@@ -33,13 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
+    [DataContract]
     public struct FlexibilityStation : IEquatable<FlexibilityStation>
     {
-        public string GroupName {get;set;}        
-        public int StationNumber {get;set;}
+        [DataMember] public string GroupName {get;set;}
+        [DataMember] public int StationNumber {get;set;}
 
         public bool Equals(FlexibilityStation other)
             => GroupName == other.GroupName && StationNumber == other.StationNumber;
@@ -47,65 +49,71 @@ namespace BlackMaple.SeedTactics.Scheduling
             => (GroupName.GetHashCode(), StationNumber.GetHashCode()).GetHashCode();
     }
 
+    [DataContract]
     public class FlexRouteStop
     {
-        public string MachineGroup {get;set;}
-        public string Program {get;set;}
-        public HashSet<int> Machines {get;} = new HashSet<int>();
-        public TimeSpan ExpectedCycleTime {get;set;}
+        [DataMember] public string MachineGroup {get;set;}
+        [DataMember] public string Program {get;set;}
+        [DataMember] public HashSet<int> Machines {get;} = new HashSet<int>();
+        [DataMember] public TimeSpan ExpectedCycleTime {get;set;}
     }
 
+    [DataContract]
     public class FlexPath
     {
-        public HashSet<int> LoadStations {get;} = new HashSet<int>();
-        public TimeSpan ExpectedLoadTime {get;set;}
+        [DataMember] public HashSet<int> LoadStations {get;} = new HashSet<int>();
+        [DataMember] public TimeSpan ExpectedLoadTime {get;set;}
 
-        public IList<FlexRouteStop> Stops {get;} = new List<FlexRouteStop>();
+        [DataMember] public IList<FlexRouteStop> Stops {get;} = new List<FlexRouteStop>();
 
-        public HashSet<int> UnloadStations {get;} = new HashSet<int>();
-        public TimeSpan ExpectedUnloadTime {get;set;}
+        [DataMember] public HashSet<int> UnloadStations {get;} = new HashSet<int>();
+        [DataMember] public TimeSpan ExpectedUnloadTime {get;set;}
 
-        public HashSet<string> Pallets {get;} = new HashSet<string>();
+        [DataMember] public HashSet<string> Pallets {get;} = new HashSet<string>();
 
-        public string Fixture {get;set;}
-        public int Face {get;set;}
-        public int QuantityOnFace {get;set;}
+        [DataMember] public string Fixture {get;set;}
+        [DataMember] public int Face {get;set;}
+        [DataMember] public int QuantityOnFace {get;set;}
     }
 
+    [DataContract]
     public class FlexProcess
     {
-        public int ProcessNumber {get;set;}
-        public IList<FlexPath> Paths {get;} = new List<FlexPath>();
+        [DataMember] public int ProcessNumber {get;set;}
+        [DataMember] public IList<FlexPath> Paths {get;} = new List<FlexPath>();
     }
 
+    [DataContract]
     public enum PartReadiness
     {
-        ProductionReady,
-        ProveOutOnly
+        [EnumMember] ProductionReady,
+        [EnumMember] ProveOutOnly
     }
 
+    [DataContract]
     public class FlexPart
     {
-        public string Name {get;set;}
-        public PartReadiness Readiness {get;set;}
-        public IList<FlexProcess> Processes {get;} = new List<FlexProcess>();
+        [DataMember] public string Name {get;set;}
+        [DataMember] public PartReadiness Readiness {get;set;}
+        [DataMember] public IList<FlexProcess> Processes {get;} = new List<FlexProcess>();
     }
 
+    [DataContract]
     public class FlexPlan
     {
         ///All the parts in the flexibility plan
-        public IList<FlexPart> Parts {get;} = new List<FlexPart>();
-        
+        [DataMember] public IList<FlexPart> Parts {get;} = new List<FlexPart>();
+
         ///Cell efficiency as a percentage between 0 and 1
-        public double CellEfficiency {get;set;} = 1.0;
+        [DataMember] public double CellEfficiency {get;set;} = 1.0;
 
         ///Travel time of the cart between two points (average)
-        public TimeSpan ExpectedCartTravelTime {get;set;} = TimeSpan.FromMinutes(1);
+        [DataMember] public TimeSpan ExpectedCartTravelTime {get;set;} = TimeSpan.FromMinutes(1);
 
         ///Time for a rotary swap from machine queue to machine worktable
-        public TimeSpan ExpectedRotarySwapTime {get;set;} = TimeSpan.FromMinutes(0.5);
+        [DataMember] public TimeSpan ExpectedRotarySwapTime {get;set;} = TimeSpan.FromMinutes(0.5);
 
-        public string OriginalSeedtacticPlanningJson { get; set; }
-        public string OriginalMastModelFileName { get; set; }
+        [DataMember] public string OriginalSeedtacticPlanningJson { get; set; }
+        [DataMember] public string OriginalMastModelFileName { get; set; }
     }
  }
