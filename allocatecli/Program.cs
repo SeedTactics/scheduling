@@ -107,7 +107,6 @@ namespace AllocateCli
             {
                 depPath = Path.GetDirectoryName(p);
                 fullPath = p;
-                LoadFromAssemblyPath(p);
             }
 
             public IAllocateInterface LoadPlugin()
@@ -138,19 +137,18 @@ namespace AllocateCli
             protected override Assembly Load(AssemblyName assemblyName)
             {
                 var deps = DependencyContext.Default;
-                var res = deps.CompileLibraries.Where(d => d.Name.Contains(assemblyName.Name)).ToList();
-                if (res.Count > 0)
+                var compileLibs = deps.CompileLibraries.Where(d => d.Name.Contains(assemblyName.Name));
+                if (compileLibs.Any())
                 {
-                    return Assembly.Load(new AssemblyName(res.First().Name));
+                    return Assembly.Load(new AssemblyName(compileLibs.First().Name));
                 }
-                else
+
+                var depFullPath = Path.Combine(depPath, assemblyName.Name + ".dll");
+                if (File.Exists(depFullPath))
                 {
-                    var depFullPath = Path.Combine(depPath, assemblyName.Name + ".dll");
-                    if (File.Exists(depFullPath))
-                    {
-                        return LoadFromAssemblyPath(depFullPath);
-                    }
+                    return LoadFromAssemblyPath(depFullPath);
                 }
+
                 return Assembly.Load(assemblyName);
             }
         }
