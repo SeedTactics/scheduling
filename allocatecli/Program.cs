@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Loader;
 
 using CommandLine;
 using BlackMaple.SeedOrders;
 using BlackMaple.SeedTactics.Scheduling;
-using Newtonsoft.Json;
+using Microsoft.Extensions.DependencyModel;
 
 namespace AllocateCli
 {
@@ -49,34 +52,33 @@ namespace AllocateCli
 
             //load inputs
 
-            var flex = JsonConvert.DeserializeObject<FlexPlan>(File.ReadAllText(options.FlexJsonFile));
+            var flex = ReadJsonFile<FlexPlan>(options.FlexJsonFile);
 
             IEnumerable<StationDowntime> downtime;
             if (string.IsNullOrEmpty(options.DowntimeJsonFile))
                 downtime = new StationDowntime[] {};
             else
-                downtime = JsonConvert.DeserializeObject<List<StationDowntime>>(
-                    File.ReadAllText(options.DowntimeJsonFile)
-                );
+                downtime = ReadJsonFile<List<StationDowntime>>(options.DowntimeJsonFile);
 
 
             UnscheduledStatus status;
             if (string.IsNullOrEmpty(options.BookingsJsonFile))
             {
+
                 using (var reader = new StreamReader(Console.OpenStandardInput(), Console.InputEncoding))
                 {
-                    var s = new JsonSerializer();
-                    status = s.Deserialize<UnscheduledStatus>(new JsonTextReader(reader));
+                    var s = new Newtonsoft.Json.JsonSerializer();
+                    status = s.Deserialize<UnscheduledStatus>(new Newtonsoft.Json.JsonTextReader(reader));
                 }
 
             } else {
-                status = JsonConvert.DeserializeObject<UnscheduledStatus>(
-                    File.ReadAllText(options.BookingsJsonFile)
-                );
+                status = Newtonsoft.Json.JsonConvert.DeserializeObject<UnscheduledStatus>(
+                    File.ReadAllText(options.BookingsJsonFile));
             }
 
             //run allocation
-            var allocate = LoadPlugin(options);
+            var loader = new AssemblyLoader(Path.GetFullPath(options.Plugin));
+            var allocate = loader.LoadPlugin();
             if (allocate == null) return 1;
 
             var results = allocate.Allocate(
@@ -91,26 +93,88 @@ namespace AllocateCli
 
             //print results
 
-            System.Console.WriteLine(JsonConvert.SerializeObject(results, Formatting.Indented));
+            System.Console.WriteLine(SerializeObject(results));
 
             return 0;
         }
 
-        private static IAllocateInterface LoadPlugin(Options options)
+        public class AssemblyLoader : AssemblyLoadContext
         {
-            var a = System.Reflection.Assembly.LoadFrom(options.Plugin);
-            foreach (var t in a.GetTypes())
+            private string depPath;
+            private string fullPath;
+
+            public AssemblyLoader(string p)
             {
-                foreach (var i in t.GetInterfaces())
-                {
-                    if (i == typeof(IAllocateInterface))
+                depPath = Path.GetDirectoryName(p);
+                fullPath = p;
+                LoadFromAssemblyPath(p);
+            }
+
+            public IAllocateInterface LoadPlugin()
+            {
+                try {
+                    var a = LoadFromAssemblyPath(Path.GetFullPath(fullPath));
+                    foreach (var t in a.GetTypes())
                     {
-                        return (IAllocateInterface)Activator.CreateInstance(t);
+                        foreach (var i in t.GetInterfaces())
+                        {
+                            if (i == typeof(IAllocateInterface))
+                            {
+                                return (IAllocateInterface)Activator.CreateInstance(t);
+                            }
+                        }
+                    }
+                    System.Console.Error.WriteLine("Plugin does not contain implementation of IAllocateInterface");
+                }
+                catch (System.Reflection.ReflectionTypeLoadException ex)
+                {
+                    System.Console.Error.WriteLine(ex.ToString());
+                    foreach (var l in ex.LoaderExceptions)
+                        System.Console.Error.WriteLine(l.ToString());
+                }
+                return null;
+            }
+
+            protected override Assembly Load(AssemblyName assemblyName)
+            {
+                var deps = DependencyContext.Default;
+                var res = deps.CompileLibraries.Where(d => d.Name.Contains(assemblyName.Name)).ToList();
+                if (res.Count > 0)
+                {
+                    return Assembly.Load(new AssemblyName(res.First().Name));
+                }
+                else
+                {
+                    var depFullPath = Path.Combine(depPath, assemblyName.Name + ".dll");
+                    if (File.Exists(depFullPath))
+                    {
+                        return LoadFromAssemblyPath(depFullPath);
                     }
                 }
+                return Assembly.Load(assemblyName);
             }
-            System.Console.Error.WriteLine("Plugin does not contain implementation of IAllocateInterface");
-            return null;
         }
+
+        private static T ReadJsonFile<T>(string fileName)
+        {
+            using (var f = File.OpenRead(fileName))
+            {
+                var s = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
+                return (T)s.ReadObject(f);
+            }
+        }
+
+        public static string SerializeObject<T>(T obj)
+        {
+            var settings = new System.Runtime.Serialization.Json.DataContractJsonSerializerSettings();
+            settings.UseSimpleDictionaryFormat = true;
+            settings.DateTimeFormat = new System.Runtime.Serialization.DateTimeFormat("yyyy-MM-ddTHH:mm:ssZ");
+            var s = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T), settings);
+            var m = new MemoryStream();
+            s.WriteObject(m, obj);
+            var bytes = m.ToArray();
+            return System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+        }
+
     }
 }
