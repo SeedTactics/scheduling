@@ -1,0 +1,167 @@
+{
+    "CellEfficiency": 0.8,
+    "ExpectedCartTravelTime": "PT37S",
+    "ExpectedRotarySwapTime": "PT10S",
+    "Parts": [
+        {
+            "Name": "part1",
+            "Processes": [
+                {
+                    "Paths": [
+                        {
+                            "ExpectedLoadTime": "PT5M",
+                            "ExpectedUnloadTime": "PT5M",
+                            "Face": 1,
+                            "Fixture": "",
+                            "LoadStations": [
+                                1
+                            ],
+                            "Pallets": [
+                                "pal1-1",
+                                "pal1-2"
+                            ],
+                            "QuantityOnFace": 1,
+                            "Stops": [
+                                {
+                                    "ExpectedCycleTime": "PT1H4M",
+                                    "MachineGroup": "Machine",
+                                    "Machines": [
+                                        1,
+                                        2
+                                    ],
+                                    "Program": "AAAA"
+                                }
+                            ],
+                            "UnloadStations": [
+                                1
+                            ]
+                        }
+                    ],
+                    "ProcessNumber": 1
+                },
+                {
+                    "Paths": [
+                        {
+                            "ExpectedLoadTime": "PT5M",
+                            "ExpectedUnloadTime": "PT5M",
+                            "Face": 2,
+                            "Fixture": "",
+                            "LoadStations": [
+                                1
+                            ],
+                            "Pallets": [
+                                "pal1-1",
+                                "pal1-2"
+                            ],
+                            "QuantityOnFace": 1,
+                            "Stops": [
+                                {
+                                    "ExpectedCycleTime": "PT25M",
+                                    "MachineGroup": "Machine",
+                                    "Machines": [
+                                        1,
+                                        2
+                                    ],
+                                    "Program": "BBBB"
+                                }
+                            ],
+                            "UnloadStations": [
+                                1
+                            ]
+                        }
+                    ],
+                    "ProcessNumber": 2
+                }
+            ],
+            "Readiness": 0
+        },
+        {
+            "Name": "part2",
+            "Processes": [
+                {
+                    "Paths": [
+                        {
+                            "ExpectedLoadTime": "PT10M",
+                            "ExpectedUnloadTime": "PT10M",
+                            "Face": 1,
+                            "Fixture": "",
+                            "LoadStations": [
+                                2
+                            ],
+                            "Pallets": [
+                                "pal3-1",
+                                "pal3-2",
+                                "pal3-3",
+                                "pal2"
+                            ],
+                            "QuantityOnFace": 2,
+                            "Stops": [
+                                {
+                                    "ExpectedCycleTime": "PT1H8M",
+                                    "MachineGroup": "Machine",
+                                    "Machines": [
+                                        1,
+                                        2,
+                                        3,
+                                        4
+                                    ],
+                                    "Program": "CCCC"
+                                }
+                            ],
+                            "UnloadStations": [
+                                2
+                            ]
+                        }
+                    ],
+                    "ProcessNumber": 1
+                }
+            ],
+            "Readiness": 0
+        },
+        {
+            "Name": "part3",
+            "Processes": [
+                {
+                    "Paths": [
+                        {
+                            "ExpectedLoadTime": "PT15M",
+                            "ExpectedUnloadTime": "PT15M",
+                            "Face": 1,
+                            "Fixture": "",
+                            "LoadStations": [
+                                1,
+                                2
+                            ],
+                            "Pallets": [
+                                "pal3-1",
+                                "pal3-2",
+                                "pal3-3",
+                                "pal2"
+                            ],
+                            "QuantityOnFace": 3,
+                            "Stops": [
+                                {
+                                    "ExpectedCycleTime": "PT3H39M",
+                                    "MachineGroup": "Machine",
+                                    "Machines": [
+                                        1,
+                                        2,
+                                        3,
+                                        4
+                                    ],
+                                    "Program": "DDDD"
+                                }
+                            ],
+                            "UnloadStations": [
+                                1,
+                                2
+                            ]
+                        }
+                    ],
+                    "ProcessNumber": 1
+                }
+            ],
+            "Readiness": 0
+        }
+    ]
+}
