@@ -45,10 +45,11 @@ def encode_bookings(bookings, prev_parts):
                                for _,p in b[1].iterrows()]})
     return json.dumps({"UnscheduledBookings": blst, "ScheduledParts": prev_parts})
 
-def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[]):
+def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=[]):
     bookings_json = encode_bookings(bookings, prev_parts)
+    downtime_json = json.dumps(downtimes)
     proc = subprocess.run(args=["dotnet", "run", "-p", allocatecli, "--",
-                                "-f", flex_file, "-p", plugin],
+                                "-f", flex_file, "-p", plugin, "--downtimes", downtime_json],
                           input=bookings_json,
                           encoding="utf-8",
                           stdout=subprocess.PIPE,

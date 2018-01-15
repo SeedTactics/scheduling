@@ -32,8 +32,11 @@ namespace AllocateCli
         [Option("fill", HelpText="Fill method", Default=BookingFillMethod.FillInAnyOrder)]
         public BookingFillMethod FillMethod {get;set;}
 
-        [Option("downtimes", HelpText="Path to downtimes json file (defaults to no downtimes)")]
+        [Option("downtime-file", HelpText="Path to downtimes json file (defaults to no downtimes)")]
         public string DowntimeJsonFile {get;set;}
+
+        [Option("downtimes", HelpText="Downtime json (defaults to no downtimes)")]
+        public string DowntimeJson {get;set;}
     }
 
     class Program
@@ -55,10 +58,14 @@ namespace AllocateCli
             var flex = ReadJsonFile<FlexPlan>(options.FlexJsonFile);
 
             IEnumerable<StationDowntime> downtime;
-            if (string.IsNullOrEmpty(options.DowntimeJsonFile))
-                downtime = new StationDowntime[] {};
+            if (!string.IsNullOrEmpty(options.DowntimeJsonFile))
+                downtime = Newtonsoft.Json.JsonConvert.DeserializeObject<List<StationDowntime>>(
+                    System.IO.File.ReadAllText(options.DowntimeJsonFile));
+            else if (!string.IsNullOrEmpty(options.DowntimeJson))
+                downtime = Newtonsoft.Json.JsonConvert.DeserializeObject<List<StationDowntime>>(
+                    options.DowntimeJson);
             else
-                downtime = ReadJsonFile<List<StationDowntime>>(options.DowntimeJsonFile);
+                downtime = new StationDowntime[] {};
 
 
             UnscheduledStatus status;
