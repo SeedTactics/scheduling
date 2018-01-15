@@ -3,6 +3,8 @@ import pandas as pd
 import subprocess
 import json
 import os
+import plotly.figure_factory as ff
+import plotly.graph_objs as go
 
 # Compied and modified from https://github.com/pandas-dev/pandas/pull/19065 until new pandas release
 iso_pater = re.compile(r"""P
@@ -45,6 +47,29 @@ def encode_bookings(bookings, prev_parts):
                                for _,p in b[1].iterrows()]})
     return json.dumps({"UnscheduledBookings": blst, "ScheduledParts": prev_parts})
 
+def print_result_summary(results):
+    print("Simulation from {} to {} UTC".format(results["Jobs"][0]["RouteStartUTC"], results["Jobs"][0]["RouteEndUTC"]))
+    for j in results["Jobs"]:
+        print("* {} ".format(j["PartName"]))
+        print("    Priority: {}".format(j["Priority"]))
+        procCntr = 1
+        for proc in j["ProcsAndPaths"]:
+            print("    Proc {}".format(procCntr))
+            pathCntr = 0
+            for path in proc:
+                print("        Path {}".format(pathCntr))
+                if procCntr == 1:
+                    print("            Completed {}".format(j["CyclesOnFirstProcess"][pathCntr]))
+                print("            Pallets {}".format(",".join(path["Pallets"])))
+                print("            Loads {}".format(",".join([str(l) for l in path["Load"]])))
+                stops = []
+                for s in path["Stops"]:
+                    stops.append(",".join([s["StationGroup"] + n for n in s["Stations"].keys()]))
+                print("            Stops {}".format("->".join(stops)))
+                print("            Unload {}".format(",".join([str(u) for u in path["Unload"]])))
+                pathCntr += 1
+            procCntr += 1
+
 def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=[]):
     bookings_json = encode_bookings(bookings, prev_parts)
     downtime_json = json.dumps(downtimes)
@@ -61,14 +86,54 @@ def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=
     results_json = proc.stdout
     results = json.loads(results_json)
     results["OriginalJson"] = results_json
+    return results
 
-    # Convert the results to pandas frames
+def simstat(results):
     simstat = pd.DataFrame(results["SimStations"])
     simstat["StartUTC"] = pd.to_datetime(simstat["StartUTC"])
     simstat["EndUTC"] = pd.to_datetime(simstat["EndUTC"])
     simstat["PlannedDownTime"] = simstat["PlannedDownTime"].apply(parse_iso_format_string)
     simstat["UtilizationTime"] = simstat["UtilizationTime"].apply(parse_iso_format_string)
-    return results, simstat
+    return simstat
+
+def plot_simstat(simstat):
+    s = simstat.copy()
+    s["Task"] = s["StationGroup"] + s["StationNum"].apply(str)
+    s["Start"] = s["StartUTC"]
+    s["Finish"] = s["EndUTC"]
+    return ff.create_gantt(s, index_col="StationGroup", group_tasks=True)
+
+def simprod(results):
+    simprod = pd.DataFrame()
+    for j in results["Jobs"]:
+        procCntr = 1
+        for proc in j["ProcsAndPaths"]:
+            pathCntr = 0
+            for path in proc:
+                p = pd.DataFrame(path["SimulatedProduction"])
+                p["Part"] = j["PartName"]
+                p["Process"] = procCntr
+                p["Path"] = pathCntr
+                simprod = simprod.append(p)
+                pathCntr += 1
+            procCntr += 1
+    return simprod
+
+def plot_simprod(results):
+    plots = []
+    for j in results["Jobs"]:
+        procCntr = 1
+        for proc in j["ProcsAndPaths"]:
+            pathCntr = 0
+            for path in proc:
+                p = pd.DataFrame(path["SimulatedProduction"])
+                plots.append(go.Scatter(
+                    x=p["TimeUTC"],
+                    y=p["Quantity"],
+                    name=j["PartName"] + " " + str(procCntr) + ":" + str(pathCntr)))
+                pathCntr += 1
+            procCntr += 1
+    return plots
 
 def create_scenario(results, bookings, path, prev_parts=[]):
     if not os.path.exists(path):
