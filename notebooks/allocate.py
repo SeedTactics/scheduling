@@ -2,6 +2,7 @@ import re
 import pandas as pd
 import subprocess
 import json
+import os
 
 # Compied and modified from https://github.com/pandas-dev/pandas/pull/19065 until new pandas release
 iso_pater = re.compile(r"""P
@@ -34,7 +35,7 @@ def parse_iso_format_string(iso_fmt):
                          "{}".format(iso_fmt))
     return t
 
-def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[]):
+def encode_bookings(bookings, prev_parts):
     blst = []
     for b in bookings.groupby("BookingId"):
         blst.append({"BookingId":b[0],
@@ -42,7 +43,10 @@ def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[]):
                      "Priority":b[1]["Priority"].iloc[0].item(),
                      "Parts": [{"BookingId":b[0], "Part":p["Part"], "Quantity":p["Quantity"]}
                                for _,p in b[1].iterrows()]})
-    bookings_json = json.dumps({"UnscheduledBookings": blst, "ScheduledParts": prev_parts})
+    return json.dumps({"UnscheduledBookings": blst, "ScheduledParts": prev_parts})
+
+def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[]):
+    bookings_json = encode_bookings(bookings, prev_parts)
     proc = subprocess.run(args=["dotnet", "run", "-p", allocatecli, "--",
                                 "-f", flex_file, "-p", plugin],
                           input=bookings_json,
@@ -53,7 +57,9 @@ def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[]):
         print(proc.stderr)
     if proc.returncode != 0:
         raise Exception()
-    results = json.loads(proc.stdout)
+    results_json = proc.stdout
+    results = json.loads(results_json)
+    results["OriginalJson"] = results_json
 
     # Convert the results to pandas frames
     simstat = pd.DataFrame(results["SimStations"])
@@ -62,3 +68,12 @@ def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[]):
     simstat["PlannedDownTime"] = simstat["PlannedDownTime"].apply(parse_iso_format_string)
     simstat["UtilizationTime"] = simstat["UtilizationTime"].apply(parse_iso_format_string)
     return results, simstat
+
+def create_scenario(results, bookings, path, prev_parts=[]):
+    if not os.path.exists(path):
+        os.mkdir(path)
+    bookings_json = encode_bookings(bookings,prev_parts)
+    with open(os.path.join(path, "bookings.json"), "w") as f:
+        f.write(bookings_json)
+    with open(os.path.join(path, "results.json"), "w") as f:
+        f.write(results["OriginalJson"])
