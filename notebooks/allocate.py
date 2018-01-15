@@ -135,7 +135,7 @@ def plot_simprod(results):
             procCntr += 1
     return plots
 
-def create_scenario(results, bookings, path, prev_parts=[]):
+def create_scenario(results, bookings, path, prev_parts=[], downtimes=[]):
     if not os.path.exists(path):
         os.mkdir(path)
     bookings_json = encode_bookings(bookings,prev_parts)
@@ -143,3 +143,6 @@ def create_scenario(results, bookings, path, prev_parts=[]):
         f.write(bookings_json)
     with open(os.path.join(path, "results.json"), "w") as f:
         f.write(results["OriginalJson"])
+    if len(downtimes) > 0:
+        with open(os.path.join(path, "downtimes.json"), "w") as f:
+            f.write(json.dumps(downtimes))
