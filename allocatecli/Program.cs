@@ -46,9 +46,9 @@ namespace AllocateCli
 
             var options = ((Parsed<Options>)result).Value;
             if (!options.StartUTC.HasValue)
-                options.StartUTC = new DateTime(2016, 11, 5, 7, 0, 0, DateTimeKind.Utc);
+                options.StartUTC = (new DateTime(2016, 11, 5, 7, 0, 0, DateTimeKind.Local)).ToUniversalTime();
             if (!options.EndUTC.HasValue)
-                options.EndUTC = new DateTime(2016, 11, 6, 7, 0, 0, DateTimeKind.Utc);
+                options.EndUTC = (new DateTime(2016, 11, 6, 7, 0, 0, DateTimeKind.Local)).ToUniversalTime();
 
             //load inputs
 

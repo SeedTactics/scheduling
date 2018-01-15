@@ -49,8 +49,9 @@ def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[]):
                           encoding="utf-8",
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE)
-    if proc.returncode != 0:
+    if proc.stderr != "":
         print(proc.stderr)
+    if proc.returncode != 0:
         raise Exception()
     results = json.loads(proc.stdout)
 
