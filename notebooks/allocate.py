@@ -34,15 +34,7 @@ def parse_iso_format_string(iso_fmt):
                          "{}".format(iso_fmt))
     return t
 
-def allocate(bookings, flex_file, plugin, prev_parts=[]):
-    # I generally use one notebook per flex plan, so change this when I copy and paste the allocate function
-    flex_file = "sample-flex.json"
-
-    # The path to the plugin DLL built using netstandard.  Note that the csproj should include
-    # <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> so dependencies can be loaded
-    plugin = "../../pegboard/lib/pegboard/allocate/bin/Debug/netstandard2.0/BlackMaple.Pegboard.Allocate.dll"
-
-    # Run the allocate and load the results
+def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[]):
     blst = []
     for b in bookings.groupby("BookingId"):
         blst.append({"BookingId":b[0],
@@ -51,7 +43,7 @@ def allocate(bookings, flex_file, plugin, prev_parts=[]):
                      "Parts": [{"BookingId":b[0], "Part":p["Part"], "Quantity":p["Quantity"]}
                                for _,p in b[1].iterrows()]})
     bookings_json = json.dumps({"UnscheduledBookings": blst, "ScheduledParts": prev_parts})
-    proc = subprocess.run(args=["dotnet", "run", "-p", "../allocatecli", "--",
+    proc = subprocess.run(args=["dotnet", "run", "-p", allocatecli, "--",
                                 "-f", flex_file, "-p", plugin],
                           input=bookings_json,
                           encoding="utf-8",
