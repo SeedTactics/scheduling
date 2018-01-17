@@ -70,11 +70,19 @@ def print_result_summary(results):
                 pathCntr += 1
             procCntr += 1
 
-def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=[]):
+def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=[], start_utc=None, end_utc=None):
     bookings_json = encode_bookings(bookings, prev_parts)
     downtime_json = json.dumps(downtimes)
-    proc = subprocess.run(args=["dotnet", "run", "-p", allocatecli, "--",
-                                "-f", flex_file, "-p", plugin, "--downtimes", downtime_json],
+    args =[ "dotnet", "run", "-p", allocatecli, "--",
+           "-f", flex_file, "-p", plugin, "--downtimes", downtime_json
+          ]
+    if start_utc != None:
+        args.append("--start")
+        args.append(start_utc)
+    if end_utc != None:
+        args.append("--end")
+        args.append(end_utc)
+    proc = subprocess.run(args=args,
                           input=bookings_json,
                           encoding="utf-8",
                           stdout=subprocess.PIPE,
