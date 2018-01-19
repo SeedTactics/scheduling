@@ -99,10 +99,22 @@ namespace BlackMaple.SeedTactics.Scheduling
     }
 
     [DataContract]
+    public class FlexLaborTeam
+    {
+        [DataMember] public string TeamName {get;set;}
+        [DataMember] public int NumberOfOperators {get;set;}
+        [DataMember] public IList<int> LoadStations {get;set;}
+    }
+
+    [DataContract]
     public class FlexPlan
     {
         ///All the parts in the flexibility plan
         [DataMember] public IList<FlexPart> Parts {get; private set;} = new List<FlexPart>();
+
+        ///All the labor teams which are assigned to stations.  If the list is empty, it is assumed
+        ///that each station has a dedicated labor operator.
+        [DataMember] public IList<FlexLaborTeam> LaborTeams {get; private set;} = new List<FlexLaborTeam>();
 
         ///Cell efficiency as a percentage between 0 and 1
         [DataMember] public double CellEfficiency {get;set;} = 1.0;
