@@ -74,6 +74,16 @@ namespace BlackMaple.SeedTactics.Scheduling
         [DataMember] public string Fixture {get;set;}
         [DataMember] public int Face {get;set;}
         [DataMember] public int QuantityOnFace {get;set;}
+
+        // Optional input queue. If given, only allow loading when the queue contains a
+        // piece of material.
+        [DataMember(IsRequired=false, EmitDefaultValue=false)]
+        public string InputQueue {get;set;}
+
+        // Optional output queue.  If given, place completed material into this queue
+        // and also do not unload if the queue is full.
+        [DataMember(IsRequired=false, EmitDefaultValue=false)]
+        public string OutputQueue {get;set;}
     }
 
     [DataContract]
@@ -107,6 +117,18 @@ namespace BlackMaple.SeedTactics.Scheduling
     }
 
     [DataContract]
+    public class FlexQueueSize
+    {
+        //once an output queue grows to this size, stop loading new parts
+        //which are destined for this queue
+        [DataMember(IsRequired=true)] public int MaxSizeBeforeStopLoading {get;set;}
+
+        //once an output queue grows to this size, stop unloading parts
+        //and keep them in the buffer inside the cell
+        [DataMember(IsRequired=true)] public int MaxSizeBeforeStopUnloading {get;set;}
+    }
+
+    [DataContract]
     public class FlexPlan
     {
         ///All the parts in the flexibility plan
@@ -115,6 +137,9 @@ namespace BlackMaple.SeedTactics.Scheduling
         ///All the labor teams which are assigned to stations.  If the list is empty, it is assumed
         ///that each station has a dedicated labor operator.
         [DataMember] public IList<FlexLaborTeam> LaborTeams {get; private set;} = new List<FlexLaborTeam>();
+
+        ///Queue sizes (if in-process queues are used)
+        [DataMember] public IDictionary<string, FlexQueueSize> QueueSizes {get;private set;} = new Dictionary<string, FlexQueueSize>();
 
         ///Cell efficiency as a percentage between 0 and 1
         [DataMember] public double CellEfficiency {get;set;} = 1.0;

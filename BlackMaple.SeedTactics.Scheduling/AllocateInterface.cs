@@ -59,7 +59,8 @@ namespace BlackMaple.SeedTactics.Scheduling
     {
         AllocateResult Allocate(
             SeedOrders.UnscheduledStatus bookings,
-            JobsAndExtraParts previousSchedule,
+            PlannedSchedule previousSchedule,
+            CurrentStatus currentStatus,
             FlexPlan flexPlan,
             DateTime startUTC,
             DateTime endUTC,

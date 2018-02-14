@@ -68,18 +68,18 @@ namespace AllocateCli
                 downtime = new StationDowntime[] {};
 
 
-            UnscheduledStatus status;
+            UnscheduledStatus bookings;
             if (string.IsNullOrEmpty(options.BookingsJsonFile))
             {
 
                 using (var reader = new StreamReader(Console.OpenStandardInput(), Console.InputEncoding))
                 {
                     var s = new Newtonsoft.Json.JsonSerializer();
-                    status = s.Deserialize<UnscheduledStatus>(new Newtonsoft.Json.JsonTextReader(reader));
+                    bookings = s.Deserialize<UnscheduledStatus>(new Newtonsoft.Json.JsonTextReader(reader));
                 }
 
             } else {
-                status = Newtonsoft.Json.JsonConvert.DeserializeObject<UnscheduledStatus>(
+                bookings = Newtonsoft.Json.JsonConvert.DeserializeObject<UnscheduledStatus>(
                     File.ReadAllText(options.BookingsJsonFile));
             }
 
@@ -89,8 +89,9 @@ namespace AllocateCli
             if (allocate == null) return 1;
 
             var results = allocate.Allocate(
-                status,
-                default(BlackMaple.MachineWatchInterface.JobsAndExtraParts),
+                bookings,
+                default(BlackMaple.MachineWatchInterface.PlannedSchedule),
+                default(BlackMaple.MachineWatchInterface.CurrentStatus),
                 flex,
                 options.StartUTC.Value,
                 options.EndUTC.Value,

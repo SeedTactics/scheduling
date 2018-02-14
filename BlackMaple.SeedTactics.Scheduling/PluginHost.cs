@@ -76,6 +76,7 @@ namespace BlackMaple.SeedTactics.Scheduling
         public string Allocate(
             string bookingsJson,
             string previousScheduleJson,
+            string currentStatusJson,
             string flexPlanJson,
             DateTime startUTC,
             DateTime endUTC,
@@ -84,11 +85,12 @@ namespace BlackMaple.SeedTactics.Scheduling
             string downtimesJson)
         {
             var bookings = DeserializeObject<SeedOrders.UnscheduledStatus>(bookingsJson);
-            var previousSchedule = DeserializeObject<MachineWatchInterface.JobsAndExtraParts>(previousScheduleJson);
+            var previousSchedule = DeserializeObject<MachineWatchInterface.PlannedSchedule>(previousScheduleJson);
+            var status = DeserializeObject<MachineWatchInterface.CurrentStatus>(currentStatusJson);
             var plan = DeserializeObject<FlexPlan>(flexPlanJson);
             var downtimes = DeserializeObject<List<StationDowntime>>(downtimesJson);
             var result = _allocate.Allocate(
-                bookings, previousSchedule, plan, startUTC,
+                bookings, previousSchedule, status, plan, startUTC,
                 endUTC, fillMethod, scheduleId,
                 downtimes);
 
