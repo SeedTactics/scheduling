@@ -56,7 +56,7 @@ def print_result_summary(results):
         for proc in j["ProcsAndPaths"]:
             print("    Proc {}".format(procCntr))
             pathCntr = 0
-            for path in proc:
+            for path in proc["paths"]:
                 print("        Path {}".format(pathCntr))
                 if procCntr == 1:
                     print("            Completed {}".format(j["CyclesOnFirstProcess"][pathCntr]))
@@ -117,7 +117,7 @@ def simprod(results):
         procCntr = 1
         for proc in j["ProcsAndPaths"]:
             pathCntr = 0
-            for path in proc:
+            for path in proc["paths"]:
                 p = pd.DataFrame(path["SimulatedProduction"])
                 p["Part"] = j["PartName"]
                 p["Process"] = procCntr
@@ -133,7 +133,7 @@ def plot_simprod(results):
         procCntr = 1
         for proc in j["ProcsAndPaths"]:
             pathCntr = 0
-            for path in proc:
+            for path in proc["paths"]:
                 p = pd.DataFrame(path["SimulatedProduction"])
                 plots.append(go.Scatter(
                     x=p["TimeUTC"],
