@@ -46,6 +46,7 @@ namespace BlackMaple.SeedTactics.Scheduling
         [DataMember] public IEnumerable<SimulatedStationUtilization> SimStations { get; set; }
         [DataMember] public IEnumerable<string> NewScheduledOrders { get; set; }
         [DataMember] public IEnumerable<SeedOrders.ScheduledPartWithoutBooking> NewExtraParts { get; set; }
+        [DataMember] public IDictionary<string, QueueSize> QueueSizes {get;set;}
     }
 
     [Serializable, DataContract]
