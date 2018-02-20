@@ -121,11 +121,13 @@ namespace BlackMaple.SeedTactics.Scheduling
     {
         //once an output queue grows to this size, stop loading new parts
         //which are destined for this queue
-        [DataMember(IsRequired=true)] public int MaxSizeBeforeStopLoading {get;set;}
+        [DataMember(IsRequired=false, EmitDefaultValue=false)]
+        public int? MaxSizeBeforeStopLoading {get;set;}
 
         //once an output queue grows to this size, stop unloading parts
         //and keep them in the buffer inside the cell
-        [DataMember(IsRequired=true)] public int MaxSizeBeforeStopUnloading {get;set;}
+        [DataMember(IsRequired=false, EmitDefaultValue=false)]
+        public int? MaxSizeBeforeStopUnloading {get;set;}
     }
 
     [DataContract]
