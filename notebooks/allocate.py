@@ -2,6 +2,7 @@ import re
 import pandas as pd
 import subprocess
 import json
+import urllib
 import os
 import plotly.figure_factory as ff
 import plotly.graph_objs as go
@@ -47,6 +48,17 @@ def encode_bookings(bookings, prev_parts):
                                for _,p in b[1].iterrows()]})
     return json.dumps({"UnscheduledBookings": blst, "ScheduledParts": prev_parts})
 
+def encode_bookings_as_workorders(bookings):
+    if bookings is None: return []
+    wlst = []
+    for index, b in bookings.iterrows():
+        wlst.append({"WorkorderId": b["BookingId"],
+                     "Part": b["Part"],
+                     "Quantity": b["Quantity"],
+                     "DueDate": b["DueDate"].isoformat(),
+                     "Priority": b["Priority"]})
+    return wlst
+
 def print_result_summary(results):
     print("Simulation from {} to {} UTC".format(results["Jobs"][0]["RouteStartUTC"], results["Jobs"][0]["RouteEndUTC"]))
     for j in results["Jobs"]:
@@ -82,11 +94,14 @@ def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=
     if end_utc != None:
         args.append("--end")
         args.append(end_utc)
+    env = os.environ.copy()
+    env["TERM"] = "xterm"
     proc = subprocess.run(args=args,
                           input=bookings_json,
                           encoding="utf-8",
                           stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE)
+                          stderr=subprocess.PIPE,
+                          env=env)
     if proc.stderr != "":
         print(proc.stderr)
     if proc.returncode != 0:
@@ -95,6 +110,24 @@ def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=
     results = json.loads(results_json)
     results["OriginalJson"] = results_json
     return results
+
+def download(results, computer, bookings=None):
+    newJobs = {
+      "Jobs": results["Jobs"],
+      "StationUse": results["SimStations"],
+      "ExtraParts": {},
+      "ArchiveCompletedJobs": True,
+      "ScheduleId": results["ScheduleId"],
+      "QueueSizes": results["QueueSizes"],
+      "CurrentUnfilledWorkorders": encode_bookings_as_workorders(bookings)
+    }
+    for p in results["NewExtraParts"]:
+        newJobs["ExtraParts"][p["Part"]] = p["Quantity"]
+    req = urllib.request.Request(url="http://" + computer + "/api/v1/jobs/add",
+                                 data=json.dumps(newJobs).encode('utf-8'),
+                                 headers={'content-type': 'application/json'},
+                                 method='POST')
+    urllib.request.urlopen(req)
 
 def simstat(results):
     simstat = pd.DataFrame(results["SimStations"])
