@@ -134,7 +134,7 @@ namespace BlackMaple.SeedTactics.Scheduling
         [DataMember(IsRequired=true)] public double RandomFreq {get;set;}
 
         [DataMember(IsRequired=true)]
-        public TimeSpan ExpectedInspectionType {get;set;}
+        public TimeSpan ExpectedInspectionTime {get;set;}
 
         //The final counter string is determined by replacing following substrings in the counter template
         public static string PalletFormatFlag(int proc)
