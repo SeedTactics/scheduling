@@ -111,7 +111,7 @@ def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=
     results["OriginalJson"] = results_json
     return results
 
-def download(results, computer, bookings=None):
+def newjobs(results, bookings=None):
     newJobs = {
       "Jobs": results["Jobs"],
       "StationUse": results["SimStations"],
@@ -123,6 +123,10 @@ def download(results, computer, bookings=None):
     }
     for p in results["NewExtraParts"]:
         newJobs["ExtraParts"][p["Part"]] = p["Quantity"]
+    return newJobs
+
+def download(results, computer, bookings=None):
+    newJobs = newjobs(results, bookings)
     req = urllib.request.Request(url="http://" + computer + "/api/v1/jobs/add",
                                  data=json.dumps(newJobs).encode('utf-8'),
                                  headers={'content-type': 'application/json'},

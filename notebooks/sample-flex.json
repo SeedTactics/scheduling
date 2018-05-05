@@ -1,12 +1,24 @@
 {
-    "CellEfficiency": 0.8,
-    "ExpectedCartTravelTime": "PT37S",
+    "CellEfficiency": 0.85,
+    "ExpectedCartTravelTime": "PT38S",
     "ExpectedRotarySwapTime": "PT10S",
+    "LaborTeams": [
+        {
+            "LoadStations": [
+                1,
+                2
+            ],
+            "NumberOfOperators": 2,
+            "TeamName": "LabTeam"
+        }
+    ],
+    "OriginalSeedtacticPlanningJson": "",
     "Parts": [
         {
-            "Name": "part1",
+            "Name": "aaa",
             "Processes": [
                 {
+                    "Inspections": [],
                     "Paths": [
                         {
                             "ExpectedLoadTime": "PT5M",
@@ -14,32 +26,39 @@
                             "Face": 1,
                             "Fixture": "",
                             "LoadStations": [
-                                1
+                                1,
+                                2
                             ],
                             "Pallets": [
-                                "pal1-1",
-                                "pal1-2"
+                                "2",
+                                "1",
+                                "4",
+                                "3"
                             ],
                             "QuantityOnFace": 1,
                             "Stops": [
                                 {
-                                    "ExpectedCycleTime": "PT1H4M",
+                                    "ExpectedCycleTime": "PT12M12S",
                                     "MachineGroup": "Machine",
                                     "Machines": [
                                         1,
-                                        2
+                                        2,
+                                        3,
+                                        4
                                     ],
-                                    "Program": "AAAA"
+                                    "Program": "100"
                                 }
                             ],
                             "UnloadStations": [
-                                1
+                                1,
+                                2
                             ]
                         }
                     ],
                     "ProcessNumber": 1
                 },
                 {
+                    "Inspections": [],
                     "Paths": [
                         {
                             "ExpectedLoadTime": "PT5M",
@@ -47,38 +66,267 @@
                             "Face": 2,
                             "Fixture": "",
                             "LoadStations": [
-                                1
+                                1,
+                                2
                             ],
                             "Pallets": [
-                                "pal1-1",
-                                "pal1-2"
+                                "2",
+                                "1",
+                                "4",
+                                "3"
                             ],
                             "QuantityOnFace": 1,
                             "Stops": [
                                 {
-                                    "ExpectedCycleTime": "PT25M",
+                                    "ExpectedCycleTime": "PT9M18S",
                                     "MachineGroup": "Machine",
                                     "Machines": [
                                         1,
-                                        2
+                                        2,
+                                        3,
+                                        4
                                     ],
-                                    "Program": "BBBB"
+                                    "Program": "200"
                                 }
                             ],
                             "UnloadStations": [
-                                1
+                                1,
+                                2
                             ]
                         }
                     ],
                     "ProcessNumber": 2
                 }
             ],
-            "Readiness": 0
+            "Readiness": 0,
+            "Wash": false
         },
         {
-            "Name": "part2",
+            "Name": "bbb",
             "Processes": [
                 {
+                    "Inspections": [],
+                    "Paths": [
+                        {
+                            "ExpectedLoadTime": "PT5M",
+                            "ExpectedUnloadTime": "PT5M",
+                            "Face": 1,
+                            "Fixture": "",
+                            "LoadStations": [
+                                1,
+                                2
+                            ],
+                            "Pallets": [
+                                "2",
+                                "1",
+                                "4",
+                                "3"
+                            ],
+                            "QuantityOnFace": 1,
+                            "Stops": [
+                                {
+                                    "ExpectedCycleTime": "PT4M",
+                                    "MachineGroup": "Machine",
+                                    "Machines": [
+                                        1,
+                                        2,
+                                        3,
+                                        4
+                                    ],
+                                    "Program": "300"
+                                }
+                            ],
+                            "UnloadStations": [
+                                1,
+                                2
+                            ]
+                        }
+                    ],
+                    "ProcessNumber": 1
+                },
+                {
+                    "Inspections": [],
+                    "Paths": [
+                        {
+                            "ExpectedLoadTime": "PT5M",
+                            "ExpectedUnloadTime": "PT5M",
+                            "Face": 2,
+                            "Fixture": "",
+                            "LoadStations": [
+                                1,
+                                2
+                            ],
+                            "Pallets": [
+                                "2",
+                                "1",
+                                "4",
+                                "3"
+                            ],
+                            "QuantityOnFace": 1,
+                            "Stops": [
+                                {
+                                    "ExpectedCycleTime": "PT20M",
+                                    "MachineGroup": "Machine",
+                                    "Machines": [
+                                        1,
+                                        2,
+                                        3,
+                                        4
+                                    ],
+                                    "Program": "400"
+                                }
+                            ],
+                            "UnloadStations": [
+                                1,
+                                2
+                            ]
+                        }
+                    ],
+                    "ProcessNumber": 2
+                }
+            ],
+            "Readiness": 0,
+            "Wash": false
+        },
+        {
+            "Name": "ccc",
+            "Processes": [
+                {
+                    "Inspections": [],
+                    "Paths": [
+                        {
+                            "ExpectedLoadTime": "PT5M",
+                            "ExpectedUnloadTime": "PT5M",
+                            "Face": 1,
+                            "Fixture": "",
+                            "LoadStations": [
+                                1,
+                                2
+                            ],
+                            "Pallets": [
+                                "2",
+                                "1",
+                                "4",
+                                "3"
+                            ],
+                            "QuantityOnFace": 1,
+                            "Stops": [
+                                {
+                                    "ExpectedCycleTime": "PT40M",
+                                    "MachineGroup": "Machine",
+                                    "Machines": [
+                                        1,
+                                        2,
+                                        3,
+                                        4
+                                    ],
+                                    "Program": "300"
+                                }
+                            ],
+                            "UnloadStations": [
+                                1,
+                                2
+                            ]
+                        }
+                    ],
+                    "ProcessNumber": 1
+                },
+                {
+                    "Inspections": [],
+                    "Paths": [
+                        {
+                            "ExpectedLoadTime": "PT5M",
+                            "ExpectedUnloadTime": "PT5M",
+                            "Face": 2,
+                            "Fixture": "",
+                            "LoadStations": [
+                                1,
+                                2
+                            ],
+                            "Pallets": [
+                                "2",
+                                "1",
+                                "4",
+                                "3"
+                            ],
+                            "QuantityOnFace": 1,
+                            "Stops": [
+                                {
+                                    "ExpectedCycleTime": "PT15M30S",
+                                    "MachineGroup": "Machine",
+                                    "Machines": [
+                                        1,
+                                        2,
+                                        3,
+                                        4
+                                    ],
+                                    "Program": "400"
+                                }
+                            ],
+                            "UnloadStations": [
+                                1,
+                                2
+                            ]
+                        }
+                    ],
+                    "ProcessNumber": 2
+                }
+            ],
+            "Readiness": 0,
+            "Wash": false
+        },
+        {
+            "Name": "xxx",
+            "Processes": [
+                {
+                    "Inspections": [],
+                    "Paths": [
+                        {
+                            "ExpectedLoadTime": "PT5M",
+                            "ExpectedUnloadTime": "PT5M",
+                            "Face": 1,
+                            "Fixture": "",
+                            "LoadStations": [
+                                1,
+                                2
+                            ],
+                            "Pallets": [
+                                "6",
+                                "7",
+                                "5",
+                                "8"
+                            ],
+                            "QuantityOnFace": 1,
+                            "Stops": [
+                                {
+                                    "ExpectedCycleTime": "PT17M30S",
+                                    "MachineGroup": "Machine",
+                                    "Machines": [
+                                        1,
+                                        2,
+                                        3,
+                                        4
+                                    ],
+                                    "Program": "100"
+                                }
+                            ],
+                            "UnloadStations": [
+                                1,
+                                2
+                            ]
+                        }
+                    ],
+                    "ProcessNumber": 1
+                }
+            ],
+            "Readiness": 0,
+            "Wash": false
+        },
+        {
+            "Name": "yyy",
+            "Processes": [
+                {
+                    "Inspections": [],
                     "Paths": [
                         {
                             "ExpectedLoadTime": "PT10M",
@@ -86,18 +334,19 @@
                             "Face": 1,
                             "Fixture": "",
                             "LoadStations": [
+                                1,
                                 2
                             ],
                             "Pallets": [
-                                "pal3-1",
-                                "pal3-2",
-                                "pal3-3",
-                                "pal2"
+                                "6",
+                                "7",
+                                "5",
+                                "8"
                             ],
                             "QuantityOnFace": 2,
                             "Stops": [
                                 {
-                                    "ExpectedCycleTime": "PT1H8M",
+                                    "ExpectedCycleTime": "PT50M",
                                     "MachineGroup": "Machine",
                                     "Machines": [
                                         1,
@@ -105,10 +354,11 @@
                                         3,
                                         4
                                     ],
-                                    "Program": "CCCC"
+                                    "Program": "500"
                                 }
                             ],
                             "UnloadStations": [
+                                1,
                                 2
                             ]
                         }
@@ -116,16 +366,18 @@
                     "ProcessNumber": 1
                 }
             ],
-            "Readiness": 0
+            "Readiness": 0,
+            "Wash": false
         },
         {
-            "Name": "part3",
+            "Name": "zzz",
             "Processes": [
                 {
+                    "Inspections": [],
                     "Paths": [
                         {
-                            "ExpectedLoadTime": "PT15M",
-                            "ExpectedUnloadTime": "PT15M",
+                            "ExpectedLoadTime": "PT5M",
+                            "ExpectedUnloadTime": "PT5M",
                             "Face": 1,
                             "Fixture": "",
                             "LoadStations": [
@@ -133,15 +385,15 @@
                                 2
                             ],
                             "Pallets": [
-                                "pal3-1",
-                                "pal3-2",
-                                "pal3-3",
-                                "pal2"
+                                "6",
+                                "7",
+                                "5",
+                                "8"
                             ],
-                            "QuantityOnFace": 3,
+                            "QuantityOnFace": 1,
                             "Stops": [
                                 {
-                                    "ExpectedCycleTime": "PT3H39M",
+                                    "ExpectedCycleTime": "PT1H17M",
                                     "MachineGroup": "Machine",
                                     "Machines": [
                                         1,
@@ -149,7 +401,7 @@
                                         3,
                                         4
                                     ],
-                                    "Program": "DDDD"
+                                    "Program": "500"
                                 }
                             ],
                             "UnloadStations": [
@@ -161,7 +413,9 @@
                     "ProcessNumber": 1
                 }
             ],
-            "Readiness": 0
+            "Readiness": 0,
+            "Wash": false
         }
-    ]
+    ],
+    "QueueSizes": {}
 }
