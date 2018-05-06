@@ -82,7 +82,7 @@ def print_result_summary(results):
                 pathCntr += 1
             procCntr += 1
 
-def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=[], start_utc=None, end_utc=None):
+def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=[], start_utc=None, end_utc=None, schid=None):
     bookings_json = encode_bookings(bookings, prev_parts)
     downtime_json = json.dumps(downtimes)
     args =[ "dotnet", "run", "-p", allocatecli, "--",
@@ -94,6 +94,9 @@ def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=
     if end_utc != None:
         args.append("--end")
         args.append(end_utc)
+    if schid != None:
+        args.append("--schid")
+        args.append(schid)
     env = os.environ.copy()
     env["TERM"] = "xterm"
     proc = subprocess.run(args=args,

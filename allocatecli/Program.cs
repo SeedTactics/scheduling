@@ -37,6 +37,9 @@ namespace AllocateCli
 
         [Option("downtimes", HelpText="Downtime json (defaults to no downtimes)")]
         public string DowntimeJson {get;set;}
+
+        [Option("schid", HelpText="Schedule Id", Default="schId1234")]
+        public string ScheduleId {get;set;}
     }
 
     class Program
@@ -96,7 +99,7 @@ namespace AllocateCli
                 options.StartUTC.Value,
                 options.EndUTC.Value,
                 options.FillMethod,
-                "schId1234",
+                options.ScheduleId,
                 downtime);
 
             //print results
