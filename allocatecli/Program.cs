@@ -93,8 +93,8 @@ namespace AllocateCli
 
             var results = allocate.Allocate(
                 bookings,
-                default(BlackMaple.MachineWatchInterface.PlannedSchedule),
-                default(BlackMaple.MachineWatchInterface.CurrentStatus),
+                default(BlackMaple.FMSInsight.API.PlannedSchedule),
+                default(BlackMaple.FMSInsight.API.CurrentStatus),
                 flex,
                 options.StartUTC.Value,
                 options.EndUTC.Value,
@@ -104,7 +104,8 @@ namespace AllocateCli
 
             //print results
 
-            System.Console.WriteLine(SerializeObject(results));
+            System.Console.WriteLine(
+                Newtonsoft.Json.JsonConvert.SerializeObject(results, Newtonsoft.Json.Formatting.Indented));
 
             return 0;
         }
@@ -166,24 +167,8 @@ namespace AllocateCli
 
         private static T ReadJsonFile<T>(string fileName)
         {
-            using (var f = File.OpenRead(fileName))
-            {
-                var s = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
-                return (T)s.ReadObject(f);
-            }
+            var json = File.ReadAllText(fileName);
+            return (T)Newtonsoft.Json.JsonConvert.DeserializeObject(json);
         }
-
-        public static string SerializeObject<T>(T obj)
-        {
-            var settings = new System.Runtime.Serialization.Json.DataContractJsonSerializerSettings();
-            settings.UseSimpleDictionaryFormat = true;
-            settings.DateTimeFormat = new System.Runtime.Serialization.DateTimeFormat("yyyy-MM-ddTHH:mm:ssZ");
-            var s = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T), settings);
-            var m = new MemoryStream();
-            s.WriteObject(m, obj);
-            var bytes = m.ToArray();
-            return System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-        }
-
     }
 }

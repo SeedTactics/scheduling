@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using BlackMaple.FMSInsight.API;
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
@@ -59,18 +60,12 @@ namespace BlackMaple.SeedTactics.Scheduling
 
         private static T DeserializeObject<T>(string json)
         {
-            var s = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
-            var m = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(json));
-            return (T)s.ReadObject(m);
+            return (T)Newtonsoft.Json.JsonConvert.DeserializeObject(json);
         }
 
         public static string SerializeObject<T>(T obj)
         {
-            var s = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(T));
-            var m = new System.IO.MemoryStream();
-            s.WriteObject(m, obj);
-            var bytes = m.ToArray();
-            return System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+            return Newtonsoft.Json.JsonConvert.SerializeObject(obj);
         }
 
         public string Allocate(
@@ -85,8 +80,8 @@ namespace BlackMaple.SeedTactics.Scheduling
             string downtimesJson)
         {
             var bookings = DeserializeObject<SeedOrders.UnscheduledStatus>(bookingsJson);
-            var previousSchedule = DeserializeObject<MachineWatchInterface.PlannedSchedule>(previousScheduleJson);
-            var status = DeserializeObject<MachineWatchInterface.CurrentStatus>(currentStatusJson);
+            var previousSchedule = DeserializeObject<PlannedSchedule>(previousScheduleJson);
+            var status = DeserializeObject<CurrentStatus>(currentStatusJson);
             var plan = DeserializeObject<FlexPlan>(flexPlanJson);
             var downtimes = DeserializeObject<List<StationDowntime>>(downtimesJson);
             var result = _allocate.Allocate(
