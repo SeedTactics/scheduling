@@ -25,8 +25,6 @@
   <ItemGroup>
     <PackageReference Include="BlackMaple.FMSInsight.API" Version="1.0.0"/>
 
-    <PackageReference Include="Newtonsoft.Json" Version="11.*"/>
-    <PackageReference Include="BlackMaple.SeedOrders" Version="3.*" />
     <PackageReference Include="CommandLineParser" Version="2.1.1-beta*" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="*" />
     <ProjectReference Include="../BlackMaple.SeedTactics.Scheduling/BlackMaple.SeedTactics.Scheduling.csproj"/>
