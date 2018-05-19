@@ -60,7 +60,7 @@ namespace BlackMaple.SeedTactics.Scheduling
 
         private static T DeserializeObject<T>(string json)
         {
-            return (T)Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
         }
 
         public static string SerializeObject<T>(T obj)
@@ -80,8 +80,8 @@ namespace BlackMaple.SeedTactics.Scheduling
             string downtimesJson)
         {
             var bookings = DeserializeObject<SeedOrders.UnscheduledStatus>(bookingsJson);
-            var previousSchedule = DeserializeObject<PlannedSchedule>(previousScheduleJson);
-            var status = DeserializeObject<CurrentStatus>(currentStatusJson);
+            var previousSchedule = PlannedSchedule.FromJson(previousScheduleJson);
+            var status = CurrentStatus.FromJson(currentStatusJson);
             var plan = DeserializeObject<FlexPlan>(flexPlanJson);
             var downtimes = DeserializeObject<List<StationDowntime>>(downtimesJson);
             var result = _allocate.Allocate(

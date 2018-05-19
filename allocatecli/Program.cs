@@ -168,7 +168,7 @@ namespace AllocateCli
         private static T ReadJsonFile<T>(string fileName)
         {
             var json = File.ReadAllText(fileName);
-            return (T)Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
         }
     }
 }
