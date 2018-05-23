@@ -140,10 +140,10 @@ def simstat(results):
     simstat = pd.DataFrame(results["SimStations"])
     simstat["StartUTC"] = pd.to_datetime(simstat["StartUTC"])
     simstat["EndUTC"] = pd.to_datetime(simstat["EndUTC"])
-    #simstat["PlannedDownTime"] = simstat["PlannedDownTime"].apply(parse_iso_format_string)
-    #simstat["UtilizationTime"] = simstat["UtilizationTime"].apply(parse_iso_format_string)
-    simstat["PlannedDownTime"] = pd.to_timedelta(simstat["PlannedDownTime"])
-    simstat["UtilizationTime"] = pd.to_timedelta(simstat["UtilizationTime"])
+    simstat["PlannedDownTime"] = simstat["PlannedDownTime"].apply(parse_iso_format_string)
+    simstat["UtilizationTime"] = simstat["UtilizationTime"].apply(parse_iso_format_string)
+    #simstat["PlannedDownTime"] = pd.to_timedelta(simstat["PlannedDownTime"])
+    #simstat["UtilizationTime"] = pd.to_timedelta(simstat["UtilizationTime"])
     return simstat
 
 def plot_simstat(simstat):

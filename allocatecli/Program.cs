@@ -9,6 +9,7 @@ using CommandLine;
 using BlackMaple.SeedOrders;
 using BlackMaple.SeedTactics.Scheduling;
 using Microsoft.Extensions.DependencyModel;
+using Newtonsoft.Json;
 
 namespace AllocateCli
 {
@@ -58,15 +59,21 @@ namespace AllocateCli
 
       //load inputs
 
-      var flex = ReadJsonFile<FlexPlan>(options.FlexJsonFile);
+      var jsonSettings = new JsonSerializerSettings();
+      jsonSettings.Converters.Add(new TimespanConverter());
+      jsonSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+      jsonSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+
+      var flex = JsonConvert.DeserializeObject<FlexPlan>(
+        System.IO.File.ReadAllText(options.FlexJsonFile), jsonSettings);
 
       IEnumerable<StationDowntime> downtime;
       if (!string.IsNullOrEmpty(options.DowntimeJsonFile))
-        downtime = Newtonsoft.Json.JsonConvert.DeserializeObject<List<StationDowntime>>(
-            System.IO.File.ReadAllText(options.DowntimeJsonFile));
+        downtime = JsonConvert.DeserializeObject<List<StationDowntime>>(
+            System.IO.File.ReadAllText(options.DowntimeJsonFile), jsonSettings);
       else if (!string.IsNullOrEmpty(options.DowntimeJson))
-        downtime = Newtonsoft.Json.JsonConvert.DeserializeObject<List<StationDowntime>>(
-            options.DowntimeJson);
+        downtime = JsonConvert.DeserializeObject<List<StationDowntime>>(
+            options.DowntimeJson, jsonSettings);
       else
         downtime = new StationDowntime[] { };
 
@@ -77,15 +84,15 @@ namespace AllocateCli
 
         using (var reader = new StreamReader(Console.OpenStandardInput(), Console.InputEncoding))
         {
-          var s = new Newtonsoft.Json.JsonSerializer();
-          bookings = s.Deserialize<UnscheduledStatus>(new Newtonsoft.Json.JsonTextReader(reader));
+          var s = JsonSerializer.Create(jsonSettings);
+          bookings = s.Deserialize<UnscheduledStatus>(new JsonTextReader(reader));
         }
 
       }
       else
       {
-        bookings = Newtonsoft.Json.JsonConvert.DeserializeObject<UnscheduledStatus>(
-            File.ReadAllText(options.BookingsJsonFile));
+        bookings = JsonConvert.DeserializeObject<UnscheduledStatus>(
+            File.ReadAllText(options.BookingsJsonFile), jsonSettings);
       }
 
       //run allocation
@@ -107,7 +114,7 @@ namespace AllocateCli
       //print results
 
       System.Console.WriteLine(
-          Newtonsoft.Json.JsonConvert.SerializeObject(results, Newtonsoft.Json.Formatting.Indented));
+          JsonConvert.SerializeObject(results, Formatting.Indented, jsonSettings));
 
       return 0;
     }
@@ -167,15 +174,9 @@ namespace AllocateCli
         return Assembly.Load(assemblyName);
       }
     }
-
-    private static T ReadJsonFile<T>(string fileName)
-    {
-      var json = File.ReadAllText(fileName);
-      return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json, new TimespanConverter());
-    }
   }
 
-  public class TimespanConverter : Newtonsoft.Json.JsonConverter
+  public class TimespanConverter : JsonConverter
   {
     public override bool CanConvert(Type objectType)
     {
@@ -185,7 +186,7 @@ namespace AllocateCli
     public override bool CanRead => true;
     public override bool CanWrite => true;
 
-    public override object ReadJson(Newtonsoft.Json.JsonReader reader, Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
       if (objectType != typeof(TimeSpan))
         throw new ArgumentException();
@@ -198,7 +199,7 @@ namespace AllocateCli
       return System.Xml.XmlConvert.ToTimeSpan(spanString);
     }
 
-    public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
       var duration = (TimeSpan)value;
       writer.WriteValue(System.Xml.XmlConvert.ToString(duration));
