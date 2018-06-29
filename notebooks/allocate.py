@@ -99,6 +99,7 @@ def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=
         args.append(schid)
     env = os.environ.copy()
     env["TERM"] = "xterm"
+    print("Running " + str(args))
     proc = subprocess.run(args=args,
                           input=bookings_json,
                           encoding="utf-8",
