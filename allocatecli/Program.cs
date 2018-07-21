@@ -10,12 +10,16 @@ using BlackMaple.SeedOrders;
 using BlackMaple.SeedTactics.Scheduling;
 using Microsoft.Extensions.DependencyModel;
 using Newtonsoft.Json;
+using System.Text;
+using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+using BlackMaple.FMSInsight.API;
 
 namespace AllocateCli
 {
   class Options
   {
-    [Option('p', "plugin", Required = true, HelpText = "Plugin to test")]
+    [Option('p', "plugin", Required = true, HelpText = "Plugin to use")]
     public string Plugin { get; set; }
 
     [Option('b', "bookings", HelpText = "Path to bookings json (defaults to standard input)")]
@@ -39,84 +43,113 @@ namespace AllocateCli
     [Option("downtimes", HelpText = "Downtime json (defaults to no downtimes)")]
     public string DowntimeJson { get; set; }
 
-    [Option("schid", HelpText = "Schedule Id", Default = "schId1234")]
+    [Option("schid", HelpText = "Schedule Id (defaults to newly generated)")]
     public string ScheduleId { get; set; }
+
+    [Option("download", HelpText = "Server to download new jobs to (defaults to just printing to stdout)")]
+    public string DownloadServer {get;set;}
   }
 
   class Program
   {
-    static int Main(string[] args)
+    static async Task<int> Main(string[] args)
     {
-      var result = Parser.Default.ParseArguments<Options>(args);
-      if (result.Tag == ParserResultType.NotParsed)
-        return 1;
+      try {
+        var result = Parser.Default.ParseArguments<Options>(args);
+        if (result.Tag == ParserResultType.NotParsed)
+          return 1;
 
-      var options = ((Parsed<Options>)result).Value;
-      if (!options.StartUTC.HasValue)
-        options.StartUTC = (new DateTime(2016, 11, 5, 7, 0, 0, DateTimeKind.Local)).ToUniversalTime();
-      if (!options.EndUTC.HasValue)
-        options.EndUTC = (new DateTime(2016, 11, 6, 7, 0, 0, DateTimeKind.Local)).ToUniversalTime();
+        var options = ((Parsed<Options>)result).Value;
+        if (!options.StartUTC.HasValue)
+          options.StartUTC = (new DateTime(2016, 11, 5, 7, 0, 0, DateTimeKind.Local)).ToUniversalTime();
+        if (!options.EndUTC.HasValue)
+          options.EndUTC = (new DateTime(2016, 11, 6, 7, 0, 0, DateTimeKind.Local)).ToUniversalTime();
 
-      //load inputs
+        //load inputs
 
-      var jsonSettings = new JsonSerializerSettings();
-      jsonSettings.Converters.Add(new BlackMaple.FMSInsight.API.TimespanConverter());
-      jsonSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-      jsonSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+        var jsonSettings = new JsonSerializerSettings();
+        jsonSettings.Converters.Add(new BlackMaple.FMSInsight.API.TimespanConverter());
+        jsonSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+        jsonSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
 
-      var flex = JsonConvert.DeserializeObject<FlexPlan>(
-        System.IO.File.ReadAllText(options.FlexJsonFile), jsonSettings);
+        var flex = JsonConvert.DeserializeObject<FlexPlan>(
+          System.IO.File.ReadAllText(options.FlexJsonFile), jsonSettings);
 
-      IEnumerable<StationDowntime> downtime;
-      if (!string.IsNullOrEmpty(options.DowntimeJsonFile))
-        downtime = JsonConvert.DeserializeObject<List<StationDowntime>>(
-            System.IO.File.ReadAllText(options.DowntimeJsonFile), jsonSettings);
-      else if (!string.IsNullOrEmpty(options.DowntimeJson))
-        downtime = JsonConvert.DeserializeObject<List<StationDowntime>>(
-            options.DowntimeJson, jsonSettings);
-      else
-        downtime = new StationDowntime[] { };
+        IEnumerable<StationDowntime> downtime;
+        if (!string.IsNullOrEmpty(options.DowntimeJsonFile))
+          downtime = JsonConvert.DeserializeObject<List<StationDowntime>>(
+              System.IO.File.ReadAllText(options.DowntimeJsonFile), jsonSettings);
+        else if (!string.IsNullOrEmpty(options.DowntimeJson))
+          downtime = JsonConvert.DeserializeObject<List<StationDowntime>>(
+              options.DowntimeJson, jsonSettings);
+        else
+          downtime = new StationDowntime[] { };
 
 
-      UnscheduledStatus bookings;
-      if (string.IsNullOrEmpty(options.BookingsJsonFile))
-      {
-
-        using (var reader = new StreamReader(Console.OpenStandardInput(), Console.InputEncoding))
+        UnscheduledStatus bookings;
+        if (string.IsNullOrEmpty(options.BookingsJsonFile))
         {
-          var s = JsonSerializer.Create(jsonSettings);
-          bookings = s.Deserialize<UnscheduledStatus>(new JsonTextReader(reader));
+
+          using (var reader = new StreamReader(Console.OpenStandardInput(), Console.InputEncoding))
+          {
+            var s = JsonSerializer.Create(jsonSettings);
+            bookings = s.Deserialize<UnscheduledStatus>(new JsonTextReader(reader));
+          }
+
+        }
+        else
+        {
+          bookings = JsonConvert.DeserializeObject<UnscheduledStatus>(
+              File.ReadAllText(options.BookingsJsonFile), jsonSettings);
         }
 
+        if (string.IsNullOrEmpty(options.ScheduleId)) {
+          options.ScheduleId = CreateScheduleId.Create();
+        }
+
+        //run allocation
+        var loader = new AssemblyLoader(Path.GetFullPath(options.Plugin));
+        var allocate = loader.LoadPlugin();
+        if (allocate == null) return 1;
+
+        var results = allocate.Allocate(
+            bookings,
+            default(BlackMaple.FMSInsight.API.PlannedSchedule),
+            default(BlackMaple.FMSInsight.API.CurrentStatus),
+            flex,
+            options.StartUTC.Value,
+            options.EndUTC.Value,
+            options.FillMethod,
+            options.ScheduleId,
+            downtime);
+
+        if (string.IsNullOrEmpty(options.DownloadServer)) {
+          //print results
+          System.Console.WriteLine(
+              JsonConvert.SerializeObject(results, Formatting.Indented, jsonSettings));
+        } else {
+          // download
+          var newJobs = new NewJobs();
+          newJobs.ScheduleId = options.ScheduleId;
+          newJobs.Jobs = new ObservableCollection<JobPlan>(results.Jobs);
+          newJobs.StationUse = new ObservableCollection<SimulatedStationUtilization>(results.SimStations);
+          newJobs.ExtraParts = results.NewExtraParts.ToDictionary(x => x.Part, x => x.Quantity);
+          newJobs.ArchiveCompletedJobs = true;
+          newJobs.QueueSizes = new Dictionary<string, QueueSize>(results.QueueSizes);
+
+          var builder = new UriBuilder(options.DownloadServer);
+          if (builder.Scheme == "") builder.Scheme = "http";
+          if (builder.Port == 80) builder.Port = 5000;
+          var client = new JobsClient(builder.Uri.ToString());
+          await client.AddAsync(newJobs, null);
+        }
+
+        return 0;
+
+      } catch (Exception ex) {
+        System.Console.Error.WriteLine("Error during allocate. " + Environment.NewLine + ex.ToString());
+        return 1;
       }
-      else
-      {
-        bookings = JsonConvert.DeserializeObject<UnscheduledStatus>(
-            File.ReadAllText(options.BookingsJsonFile), jsonSettings);
-      }
-
-      //run allocation
-      var loader = new AssemblyLoader(Path.GetFullPath(options.Plugin));
-      var allocate = loader.LoadPlugin();
-      if (allocate == null) return 1;
-
-      var results = allocate.Allocate(
-          bookings,
-          default(BlackMaple.FMSInsight.API.PlannedSchedule),
-          default(BlackMaple.FMSInsight.API.CurrentStatus),
-          flex,
-          options.StartUTC.Value,
-          options.EndUTC.Value,
-          options.FillMethod,
-          options.ScheduleId,
-          downtime);
-
-      //print results
-
-      System.Console.WriteLine(
-          JsonConvert.SerializeObject(results, Formatting.Indented, jsonSettings));
-
-      return 0;
     }
 
     public class AssemblyLoader : AssemblyLoadContext
