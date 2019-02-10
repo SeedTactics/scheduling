@@ -1,26 +1,26 @@
-version: '{build}'
+version: "{build}"
 image: Visual Studio 2017
 
 build_script:
-- ps: |
-    $tag = hg id -t -r '.^'
-    cd BlackMaple.SeedTactics.Scheduling
-    If ($tag -ne "") {
-        dotnet pack -c Release /p:VersionPrefix=$tag --include-symbols
-        Set-AppveyorBuildVariable "BMS_RELEASE_TO_NUGET" "true"
-    } else {
-        dotnet build
-    }
+  - ps: |
+      $tag = hg id -t -r '.^'
+      cd BlackMaple.SeedTactics.Scheduling
+      If ($tag -ne "") {
+          dotnet pack -c Release /p:VersionPrefix=$tag --include-symbols
+          Set-AppveyorBuildVariable "BMS_RELEASE_TO_NUGET" "true"
+      } else {
+          dotnet build
+      }
 
 artifacts:
-- path: '**/*.nupkg'
+  - path: "**/*.nupkg"
 
 deploy:
-- provider: NuGet
-  on:
-    branch: default
-    BMS_RELEASE_TO_NUGET: true
-  skip_symbols: false
-  artifact: /.*\.nupkg/
-  api_key:
-    secure: kj0pW91vWRjFl99SLY/sageGAghMFfmqFpNdJd7y+Q73eoImzcsnPCZYlwYxKIhs
+  - provider: NuGet
+    on:
+      branch: default
+      BMS_RELEASE_TO_NUGET: true
+    skip_symbols: false
+    artifact: /.*\.nupkg/
+    api_key:
+      secure: G2TzGogQH+sScPOuDvM6Cp3lEo8ibadnPBsSnkfumHdRZPw7dJeougI+7KIEXVIo
