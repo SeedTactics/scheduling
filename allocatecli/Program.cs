@@ -47,14 +47,15 @@ namespace AllocateCli
     public string ScheduleId { get; set; }
 
     [Option("download", HelpText = "Server to download new jobs to (defaults to just printing to stdout)")]
-    public string DownloadServer {get;set;}
+    public string DownloadServer { get; set; }
   }
 
   class Program
   {
     static async Task<int> Main(string[] args)
     {
-      try {
+      try
+      {
         var result = Parser.Default.ParseArguments<Options>(args);
         if (result.Tag == ParserResultType.NotParsed)
           return 1;
@@ -103,7 +104,8 @@ namespace AllocateCli
               File.ReadAllText(options.BookingsJsonFile), jsonSettings);
         }
 
-        if (string.IsNullOrEmpty(options.ScheduleId)) {
+        if (string.IsNullOrEmpty(options.ScheduleId))
+        {
           options.ScheduleId = CreateScheduleId.Create();
         }
 
@@ -123,11 +125,14 @@ namespace AllocateCli
             options.ScheduleId,
             downtime);
 
-        if (string.IsNullOrEmpty(options.DownloadServer)) {
+        if (string.IsNullOrEmpty(options.DownloadServer))
+        {
           //print results
           System.Console.WriteLine(
               JsonConvert.SerializeObject(results, Formatting.Indented, jsonSettings));
-        } else {
+        }
+        else
+        {
           // download
           var newJobs = new NewJobs();
           newJobs.ScheduleId = options.ScheduleId;
@@ -146,7 +151,9 @@ namespace AllocateCli
 
         return 0;
 
-      } catch (Exception ex) {
+      }
+      catch (Exception ex)
+      {
         System.Console.Error.WriteLine("Error during allocate. " + Environment.NewLine + ex.ToString());
         return 1;
       }
@@ -191,6 +198,8 @@ namespace AllocateCli
 
       protected override Assembly Load(AssemblyName assemblyName)
       {
+        // .NET Core 3 will have AssemblyDependencyResolver to make the following eaiser
+        // https://github.com/dotnet/samples/tree/master/core/extensions/AppWithPlugin
         var deps = DependencyContext.Default;
         var compileLibs = deps.CompileLibraries.Where(d => d.Name.Contains(assemblyName.Name));
         if (compileLibs.Any())
