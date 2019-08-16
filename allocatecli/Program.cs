@@ -145,7 +145,7 @@ namespace AllocateCli
           var builder = new UriBuilder(options.DownloadServer);
           if (builder.Scheme == "") builder.Scheme = "http";
           if (builder.Port == 80) builder.Port = 5000;
-          var client = new JobsClient(builder.Uri.ToString());
+          var client = new JobsClient(builder.Uri.ToString(), new System.Net.Http.HttpClient());
           await client.AddAsync(newJobs, null);
         }
 

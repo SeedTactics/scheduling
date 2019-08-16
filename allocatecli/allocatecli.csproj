@@ -24,8 +24,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlackMaple.FMSInsight.API" Version="1.8.0"/>
-
     <PackageReference Include="CommandLineParser" Version="2.1.1-beta*" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="*" />
     <ProjectReference Include="../BlackMaple.SeedTactics.Scheduling/BlackMaple.SeedTactics.Scheduling.csproj"/>
