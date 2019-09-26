@@ -25,6 +25,9 @@ namespace AllocateCli
     [Option('b', "bookings", HelpText = "Path to bookings json (defaults to standard input)")]
     public string BookingsJsonFile { get; set; }
 
+    [Option("bookings-csv", HelpText = "Path to bookings CSV")]
+    public string BookingsCsvFile { get; set; }
+
     [Option('f', "flex", Required = true, HelpText = "Path to flexibility json file")]
     public string FlexJsonFile { get; set; }
 
@@ -88,20 +91,59 @@ namespace AllocateCli
 
 
         UnscheduledStatus bookings;
-        if (string.IsNullOrEmpty(options.BookingsJsonFile))
+        if (!string.IsNullOrEmpty(options.BookingsJsonFile))
         {
-
+          bookings = JsonConvert.DeserializeObject<UnscheduledStatus>(
+              File.ReadAllText(options.BookingsJsonFile), jsonSettings);
+        }
+        else if (!string.IsNullOrEmpty(options.BookingsCsvFile))
+        {
+          using (var f = File.OpenRead(options.BookingsCsvFile))
+          using (var csv = new CsvHelper.CsvReader(new StreamReader(f)))
+          {
+            var bookingMap = new Dictionary<string, Booking>();
+            foreach (var row in csv.GetRecords<dynamic>())
+            {
+              var bookingId = row.Id;
+              Booking work;
+              if (bookingMap.ContainsKey(bookingId))
+              {
+                work = bookingMap[bookingId];
+              }
+              else
+              {
+                work = new Booking
+                {
+                  BookingId = bookingId,
+                  Priority = int.Parse(row.Priority),
+                  DueDate = DateTime.Parse(row.DueDate),
+                  Parts = new List<BookingDemand>(),
+                  ScheduleId = null
+                };
+                bookingMap.Add(bookingId, work);
+              }
+              work.Parts.Add(new BookingDemand
+              {
+                BookingId = bookingId,
+                Part = row.Part,
+                Quantity = int.Parse(row.Quantity),
+                CastingId = null,
+              });
+            }
+            bookings = new UnscheduledStatus()
+            {
+              UnscheduledBookings = bookingMap.Values,
+              ScheduledParts = Enumerable.Empty<ScheduledPartWithoutBooking>(),
+            };
+          }
+        }
+        else
+        {
           using (var reader = new StreamReader(Console.OpenStandardInput(), Console.InputEncoding))
           {
             var s = JsonSerializer.Create(jsonSettings);
             bookings = s.Deserialize<UnscheduledStatus>(new JsonTextReader(reader));
           }
-
-        }
-        else
-        {
-          bookings = JsonConvert.DeserializeObject<UnscheduledStatus>(
-              File.ReadAllText(options.BookingsJsonFile), jsonSettings);
         }
 
         if (string.IsNullOrEmpty(options.ScheduleId))
