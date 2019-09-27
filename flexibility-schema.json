@@ -1,0 +1,289 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "FlexPlan",
+  "description": "SeedTactic Flexibility Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "Parts",
+    "LaborTeams",
+    "CellEfficiency",
+    "ExpectedCartTravelTime",
+    "ExpectedRotarySwapTime"
+  ],
+  "properties": {
+    "Parts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/FlexPart"
+      }
+    },
+    "LaborTeams": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/FlexLaborTeam"
+      }
+    },
+    "QueueSizes": {
+      "type": ["null", "object"],
+      "additionalProperties": {
+        "$ref": "#/definitions/FlexQueueSize"
+      }
+    },
+    "CellEfficiency": {
+      "type": "number",
+      "format": "double",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "ExpectedCartTravelTime": {
+      "type": "string",
+      "format": "time-span"
+    },
+    "ExpectedRotarySwapTime": {
+      "type": "string",
+      "format": "time-span"
+    }
+  },
+  "definitions": {
+    "FlexPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["Name", "Readiness", "Processes", "Wash"],
+      "properties": {
+        "Name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Readiness": {
+          "$ref": "#/definitions/PartReadiness"
+        },
+        "Processes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/FlexProcess"
+          }
+        },
+        "Wash": {
+          "type": "boolean"
+        },
+        "ExpectedWashTime": {
+          "type": "string",
+          "format": "time-span"
+        }
+      }
+    },
+    "PartReadiness": {
+      "type": "string",
+      "enum": ["ProductionReady", "ProveOutOnly"]
+    },
+    "FlexProcess": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ProcessNumber", "Paths"],
+      "properties": {
+        "ProcessNumber": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1
+        },
+        "Paths": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/FlexPath"
+          }
+        },
+        "Inspections": {
+          "type": ["array", "null"],
+          "items": {
+            "$ref": "#/definitions/FlexInspection"
+          }
+        }
+      }
+    },
+    "FlexPath": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "LoadStations",
+        "ExpectedLoadTime",
+        "Stops",
+        "UnloadStations",
+        "ExpectedUnloadTime",
+        "Pallets",
+        "Fixture",
+        "Face",
+        "QuantityOnFace"
+      ],
+      "properties": {
+        "LoadStations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          }
+        },
+        "ExpectedLoadTime": {
+          "type": "string",
+          "format": "time-span"
+        },
+        "Stops": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/FlexRouteStop"
+          }
+        },
+        "UnloadStations": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          }
+        },
+        "ExpectedUnloadTime": {
+          "type": "string",
+          "format": "time-span"
+        },
+        "Pallets": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "Fixture": {
+          "type": ["null", "string"]
+        },
+        "Face": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1
+        },
+        "QuantityOnFace": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1
+        },
+        "InputQueue": {
+          "type": ["null", "string"]
+        },
+        "OutputQueue": {
+          "type": ["null", "string"]
+        }
+      }
+    },
+    "FlexRouteStop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["MachineGroup", "Program", "Machines"],
+      "properties": {
+        "MachineGroup": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Program": {
+          "type": "string"
+        },
+        "Machines": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          }
+        },
+        "ExpectedCycleTime": {
+          "type": "string",
+          "format": "time-span"
+        }
+      }
+    },
+    "FlexInspection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "InspectionType",
+        "CounterIdTemplate",
+        "MaxVal",
+        "TimeInterval",
+        "RandomFreq",
+        "ExpectedInspectionTime"
+      ],
+      "properties": {
+        "InspectionType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "CounterIdTemplate": {
+          "type": "string",
+          "minLength": 1
+        },
+        "MaxVal": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "TimeInterval": {
+          "type": "string",
+          "format": "time-span"
+        },
+        "RandomFreq": {
+          "type": "number",
+          "format": "double",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "ExpectedInspectionTime": {
+          "type": "string",
+          "format": "time-span"
+        }
+      }
+    },
+    "FlexLaborTeam": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["TeamName", "NumberOfOperators", "LoadStations"],
+      "properties": {
+        "TeamName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "NumberOfOperators": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0
+        },
+        "LoadStations": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "FlexQueueSize": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "MaxSizeBeforeStopUnloading": {
+          "type": ["integer", "null"],
+          "format": "int32"
+        }
+      }
+    }
+  }
+}
