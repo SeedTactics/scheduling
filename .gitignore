@@ -1,0 +1,5 @@
+**/bin/Debug/
+**/bin/Release/
+**/obj/
+notebooks/.ipynb_checkpoints/
+notebooks/__pycache__/
