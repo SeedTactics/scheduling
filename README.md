@@ -1,6 +1,5 @@
 # SeedTactic OrderLink Scheduling
 
-[![Build Status](https://ci.appveyor.com/api/projects/status/8pyaxsavarmbj5vx?svg=true)](https://ci.appveyor.com/project/wuzzeb/seedscheduling)
 [![NuGet Stats](https://img.shields.io/nuget/v/BlackMaple.SeedTactics.Scheduling.svg)](https://www.nuget.org/packages/BlackMaple.SeedTactics.Scheduling)
 
 This repository contains the scheduling plugin API for [OrderLink](https://www.seedtactics.com/products/seedtactic-orderlink).

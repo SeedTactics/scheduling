@@ -9,17 +9,9 @@
     <Product>SeedTactics</Product>
     <Copyright>Black Maple Software, LLC</Copyright>
     <Authors>John Lenz</Authors>
-    <PackageLicenseUrl>https://opensource.org/licenses/BSD-3-Clause</PackageLicenseUrl>
-    <PackageProjectUrl>https://www.seedtactics.com</PackageProjectUrl>
-    <RepositoryUrl>https://bitbucket.org/blackmaple/seedscheduling</RepositoryUrl>
-    <RepositoryType>hg</RepositoryType>
     <LangVersion>latest</LangVersion>
     <Description>
-      This package contains a utility program to help testing and analyzing
-      an allocation algorithm.  It is designed to be used from a jupyter notebook
-      to explore how an allocation algorithm performs for different inputs.
-
-      For documentation and source code, visit [the bitbucket project](https://bitbucket.org/blackmaple/seedscheduling).
+      This package contains a utility program to help testing and analyzing an allocation algorithm.  It is designed to be used from a jupyter notebook to explore how an allocation algorithm performs for different inputs.
     </Description>
   </PropertyGroup>
 
