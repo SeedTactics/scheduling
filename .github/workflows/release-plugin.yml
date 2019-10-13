@@ -1,0 +1,24 @@
+name: release-plugin
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Build
+        shell: pwsh
+        env:
+          GITHUB_REF: ${{ github.ref }}
+        run: |
+          $VER = $ENV:GITHUB_REF.Substring(11) # Remove refs/tags/v
+          dotnet pack -c Release --include-symbols /p:Version="$VER" BlackMaple.SeedTactics.Scheduling
+
+      - name: Publish To Nuget
+        run: dotnet nuget push -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json BlackMaple.SeedTactics.Scheduling\bin\Release\*.nupkg
