@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <AssemblyName>BlackMaple.SeedTactics.Scheduling</AssemblyName>
     <PackageId>BlackMaple.SeedTactics.Scheduling</PackageId>
+    <OutputType>Library</OutputType>
 
     <Title>SeedTactics scheduling base library for plugins</Title>
     <Company>Black Maple Software, LLC</Company>
@@ -17,8 +19,6 @@
     <RepositoryUrl>https://github.com/SeedTactics/scheduling.git</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
-    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
