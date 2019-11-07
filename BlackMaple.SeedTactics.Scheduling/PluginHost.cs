@@ -38,59 +38,68 @@ using BlackMaple.FMSInsight.API;
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
-    public class PluginHost : MarshalByRefObject
+  public class PluginHost : MarshalByRefObject
+  {
+    private readonly IAllocateInterface _allocate;
+
+    public PluginHost(string pluginDll)
     {
-        private readonly IAllocateInterface _allocate;
-
-        public PluginHost(string pluginDll)
+      var a = Assembly.LoadFrom(pluginDll);
+      foreach (var t in a.GetTypes())
+      {
+        foreach (var i in t.GetInterfaces())
         {
-            var a = Assembly.LoadFrom(pluginDll);
-            foreach (var t in a.GetTypes())
-            {
-                foreach (var i in t.GetInterfaces())
-                {
-                    if (_allocate == null && i == typeof(IAllocateInterface))
-                    {
-                        _allocate = (IAllocateInterface)Activator.CreateInstance(t);
-                        return;
-                    }
-                }
-            }
+          if (i == typeof(IAllocateFactory))
+          {
+            var f = (IAllocateFactory)Activator.CreateInstance(t);
+            _allocate = f.CreateAllocation();
+            return;
+          }
         }
-
-        private static T DeserializeObject<T>(string json)
+        foreach (var i in t.GetInterfaces())
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
+          if (i == typeof(IAllocateInterface))
+          {
+            _allocate = (IAllocateInterface)Activator.CreateInstance(t);
+            return;
+          }
         }
-
-        public static string SerializeObject<T>(T obj)
-        {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(obj);
-        }
-
-        public string Allocate(
-            string bookingsJson,
-            string previousScheduleJson,
-            string currentStatusJson,
-            string flexPlanJson,
-            DateTime startUTC,
-            DateTime endUTC,
-            BookingFillMethod fillMethod,
-            string scheduleId,
-            string downtimesJson)
-        {
-            var bookings = DeserializeObject<SeedOrders.UnscheduledStatus>(bookingsJson);
-            var previousSchedule = PlannedSchedule.FromJson(previousScheduleJson);
-            var status = CurrentStatus.FromJson(currentStatusJson);
-            var plan = DeserializeObject<FlexPlan>(flexPlanJson);
-            var downtimes = DeserializeObject<List<StationDowntime>>(downtimesJson);
-            var result = _allocate.Allocate(
-                bookings, previousSchedule, status, plan, startUTC,
-                endUTC, fillMethod, scheduleId,
-                downtimes);
-
-            return SerializeObject(result);
-        }
-
+      }
     }
+
+    private static T DeserializeObject<T>(string json)
+    {
+      return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
+    }
+
+    public static string SerializeObject<T>(T obj)
+    {
+      return Newtonsoft.Json.JsonConvert.SerializeObject(obj);
+    }
+
+    public string Allocate(
+        string bookingsJson,
+        string previousScheduleJson,
+        string currentStatusJson,
+        string flexPlanJson,
+        DateTime startUTC,
+        DateTime endUTC,
+        BookingFillMethod fillMethod,
+        string scheduleId,
+        string downtimesJson)
+    {
+      var bookings = DeserializeObject<SeedOrders.UnscheduledStatus>(bookingsJson);
+      var previousSchedule = PlannedSchedule.FromJson(previousScheduleJson);
+      var status = CurrentStatus.FromJson(currentStatusJson);
+      var plan = DeserializeObject<FlexPlan>(flexPlanJson);
+      var downtimes = DeserializeObject<List<StationDowntime>>(downtimesJson);
+      var result = _allocate.Allocate(
+          bookings, previousSchedule, status, plan, startUTC,
+          endUTC, fillMethod, scheduleId,
+          downtimes);
+
+      return SerializeObject(result);
+    }
+
+  }
 }

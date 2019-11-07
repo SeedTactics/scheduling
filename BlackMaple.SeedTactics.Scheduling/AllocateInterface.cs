@@ -38,35 +38,40 @@ using System.Runtime.Serialization;
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
-    [DataContract]
-    public class AllocateResult
-    {
-        [DataMember] public string ScheduleId { get; set; }
-        [DataMember] public IEnumerable<JobPlan> Jobs { get; set; }
-        [DataMember] public IEnumerable<SimulatedStationUtilization> SimStations { get; set; }
-        [DataMember] public IEnumerable<string> NewScheduledOrders { get; set; }
-        [DataMember] public IEnumerable<SeedOrders.ScheduledPartWithoutBooking> NewExtraParts { get; set; }
-        [DataMember] public IDictionary<string, QueueSize> QueueSizes {get;set;}
-    }
+  [DataContract]
+  public class AllocateResult
+  {
+    [DataMember] public string ScheduleId { get; set; }
+    [DataMember] public IEnumerable<JobPlan> Jobs { get; set; }
+    [DataMember] public IEnumerable<SimulatedStationUtilization> SimStations { get; set; }
+    [DataMember] public IEnumerable<string> NewScheduledOrders { get; set; }
+    [DataMember] public IEnumerable<SeedOrders.ScheduledPartWithoutBooking> NewExtraParts { get; set; }
+    [DataMember] public IDictionary<string, QueueSize> QueueSizes { get; set; }
+  }
 
-    [Serializable, DataContract]
-    public enum BookingFillMethod
-    {
-        [EnumMember] FillInAnyOrder,
-        [EnumMember] FillOnlyByDueDate
-    }
+  [Serializable, DataContract]
+  public enum BookingFillMethod
+  {
+    [EnumMember] FillInAnyOrder,
+    [EnumMember] FillOnlyByDueDate
+  }
 
-    public interface IAllocateInterface
-    {
-        AllocateResult Allocate(
-            SeedOrders.UnscheduledStatus bookings,
-            PlannedSchedule previousSchedule,
-            CurrentStatus currentStatus,
-            FlexPlan flexPlan,
-            DateTime startUTC,
-            DateTime endUTC,
-            BookingFillMethod fillMethod,
-            string scheduleId,
-            IEnumerable<StationDowntime> downtimes);
-    }
+  public interface IAllocateInterface
+  {
+    AllocateResult Allocate(
+        SeedOrders.UnscheduledStatus bookings,
+        PlannedSchedule previousSchedule,
+        CurrentStatus currentStatus,
+        FlexPlan flexPlan,
+        DateTime startUTC,
+        DateTime endUTC,
+        BookingFillMethod fillMethod,
+        string scheduleId,
+        IEnumerable<StationDowntime> downtimes);
+  }
+
+  public interface IAllocateFactory
+  {
+    IAllocateInterface CreateAllocation();
+  }
 }
