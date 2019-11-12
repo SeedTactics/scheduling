@@ -58,6 +58,9 @@ namespace BlackMaple.SeedTactics.Scheduling
     [DataMember(IsRequired = true)]
     public string Program { get; set; }
 
+    [DataMember(IsRequired = false, EmitDefaultValue = false)]
+    public long? Revision { get; set; }
+
     [DataMember(IsRequired = true)]
     public HashSet<int> Machines { get; private set; } = new HashSet<int>();
 
