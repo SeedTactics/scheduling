@@ -183,6 +183,28 @@ namespace AllocateCli
           newJobs.ExtraParts = results.NewExtraParts.ToDictionary(x => x.Part, x => x.Quantity);
           newJobs.ArchiveCompletedJobs = true;
           newJobs.QueueSizes = new Dictionary<string, QueueSize>(results.QueueSizes);
+          if (bookings.Programs != null)
+          {
+            var programsInJobs = new HashSet<string>(
+              results.Jobs
+              .SelectMany(j => j.ProcsAndPaths)
+              .SelectMany(p => p.Paths)
+              .SelectMany(p => p.Stops)
+              .Select(p => p.Program)
+            );
+            newJobs.Programs =
+              bookings.Programs
+              .Where(p => programsInJobs.Contains(p.ProgramName))
+              .Select(
+                prog => new BlackMaple.FMSInsight.API.ProgramEntry()
+                {
+                  ProgramName = prog.ProgramName,
+                  Revision = prog.Revision ?? 0,
+                  Comment = prog.Comment,
+                  ProgramContent = prog.ProgramContent
+                }
+              ).ToList();
+          }
 
           var builder = new UriBuilder(options.DownloadServer);
           if (builder.Scheme == "") builder.Scheme = "http";
