@@ -12,4 +12,3 @@ jobs:
         with:
           dotnet-version: "3.1.101"
       - run: dotnet build BlackMaple.SeedTactics.Scheduling
-      - run: dotnet build allocatecli
