@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Collections.Generic;
 
+#nullable enable
+
 namespace BlackMaple.SeedTactics.Scheduling
 {
   public static class CreateScheduleId
@@ -145,13 +147,14 @@ namespace BlackMaple.SeedTactics.Scheduling
     //Base 64 encoding does not preserve lexicographic order, so use a custom encoding
     private static string Base64LexEncode(byte[] bytes)
     {
-        var base64 = Convert.ToBase64String(bytes);
-        var res = new System.Text.StringBuilder();
-        foreach (char c in base64) {
-          if (c != '=')
-            res.Append(CharConvert[c]);
-        }
-        return res.ToString();
+      var base64 = Convert.ToBase64String(bytes);
+      var res = new System.Text.StringBuilder();
+      foreach (char c in base64)
+      {
+        if (c != '=')
+          res.Append(CharConvert[c]);
+      }
+      return res.ToString();
     }
   }
 }

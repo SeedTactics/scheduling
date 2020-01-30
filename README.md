@@ -6,8 +6,8 @@ This repository contains the scheduling plugin API for [OrderLink](https://www.s
 A scheduling plugin takes the unscheduled bookings and the flexibility plan and produces the daily schedule to send
 to the cell controller. For an overview of this process, see the [whitepaper](https://www.seedtactics.com/docs/concepts/orders-erp-automation).
 
-To implement a custom scheduling strategy, create a .NET assembly which references
-[BlackMaple.SeedTactics.Scheduling](https://www.nuget.org/packages/BlackMaple.SeedTactics.Scheduling/) from NuGet.
-Then implement the `IAllocateInterface` interface in a class with a default no-parameter constructor.
-OrderLink will search the .NET assembly for any class which implements the
-interface and create a new instance of this type.
+A plugin is any executable which reads the `BlackMaple.SeedTactics.Scheduling.AllocateRequest`
+formatted as JSON on standard input and writes a `BlackMaple.FMSInsight.API.NewJobs` formatted
+as JSON on standard output. If using C#, the
+[BlackMaple.SeedTactics.Scheduling](https://www.nuget.org/packages/BlackMaple.SeedTactics.Scheduling/) NuGet
+can be used. Other languages could also be used as long as the JSON formats are correctly serialized/deserialized.

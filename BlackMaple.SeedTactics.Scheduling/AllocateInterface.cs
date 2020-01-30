@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2018, John Lenz
+﻿/* Copyright (c) 2020, John Lenz
 
 All rights reserved.
 
@@ -33,45 +33,62 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using BlackMaple.FMSInsight.API;
-using System.Runtime.Serialization;
+
+#nullable enable
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
-  [DataContract]
-  public class AllocateResult
+  ///Marks that a collection of stations is down for a given time period during the allocation.
+  public class StationDowntime
   {
-    [DataMember] public string ScheduleId { get; set; }
-    [DataMember] public IEnumerable<JobPlan> Jobs { get; set; }
-    [DataMember] public IEnumerable<SimulatedStationUtilization> SimStations { get; set; }
-    [DataMember] public IEnumerable<string> NewScheduledOrders { get; set; }
-    [DataMember] public IEnumerable<SeedOrders.ScheduledPartWithoutBooking> NewExtraParts { get; set; }
-    [DataMember] public IDictionary<string, QueueSize> QueueSizes { get; set; }
+    public DateTime StartOfDowntimeUTC { get; set; }
+    public DateTime EndOfDowntimeUTC { get; set; }
+    ///An empty list means the entire cell - all stations
+    public IReadOnlyCollection<FlexibilityStation>? Station { get; set; }
   }
 
-  [Serializable, DataContract]
   public enum BookingFillMethod
   {
-    [EnumMember] FillInAnyOrder,
-    [EnumMember] FillOnlyByDueDate
+    FillInAnyOrder,
+    FillOnlyByDueDate
   }
 
-  public interface IAllocateInterface
+  // An allocation algorithm will receive an AllocateRequest as JSON on standard input and
+  // must produce a value of type BlackMaple.FMSInsight.API.NewJobs as JSON on standard output
+  public class AllocateRequest
   {
-    AllocateResult Allocate(
-        SeedOrders.UnscheduledStatus bookings,
-        PlannedSchedule previousSchedule,
-        CurrentStatus currentStatus,
-        FlexPlan flexPlan,
-        DateTime startUTC,
-        DateTime endUTC,
-        BookingFillMethod fillMethod,
-        string scheduleId,
-        IEnumerable<StationDowntime> downtimes);
+    public string ScheduleId { get; set; } = CreateScheduleId.Create();
+
+    public DateTime StartUTC { get; set; }
+
+    public DateTime EndUTC { get; set; }
+
+    public PlannedSchedule? PreviousSchedule { get; set; }
+
+    public CurrentStatus? CurrentStatus { get; set; }
+
+    public IEnumerable<SeedOrders.Booking>? UnscheduledBookings { get; set; }
+
+    public IEnumerable<SeedOrders.ScheduledPartWithoutBooking>? ScheduledParts { get; set; }
+
+    public IEnumerable<SeedOrders.Casting>? AvailableCastings { get; set; }
+
+    public FlexPlan FlexPlan { get; set; } = new FlexPlan();
+
+    public BookingFillMethod FillMethod { get; set; } = BookingFillMethod.FillInAnyOrder;
+
+    public IEnumerable<StationDowntime>? Downtimes { get; set; }
   }
 
-  public interface IAllocateFactory
+  public class AllocateResult
   {
-    IAllocateInterface CreateAllocation();
+    public IEnumerable<JobPlan> Jobs { get; set; } = Enumerable.Empty<JobPlan>();
+    public IEnumerable<SimulatedStationUtilization> SimStations { get; set; } = Enumerable.Empty<SimulatedStationUtilization>();
+    public IReadOnlyDictionary<string, int> NewExtraParts { get; set; } = new Dictionary<string, int>();
+    public IReadOnlyDictionary<string, QueueSize> QueueSizes { get; set; } = new Dictionary<string, QueueSize>();
+    public IReadOnlyDictionary<string, string>? DebugData { get; set; }
   }
+
 }

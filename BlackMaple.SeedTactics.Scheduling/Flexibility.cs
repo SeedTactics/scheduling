@@ -1,4 +1,4 @@
-/* Copyright (c) 2018, John Lenz
+/* Copyright (c) 2020, John Lenz
 
 All rights reserved.
 
@@ -33,15 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+
+#nullable enable
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
-  [DataContract]
   public struct FlexibilityStation : IEquatable<FlexibilityStation>
   {
-    [DataMember(IsRequired = true)] public string GroupName { get; set; }
-    [DataMember(IsRequired = true)] public int StationNumber { get; set; }
+    public string GroupName { get; set; }
+    public int StationNumber { get; set; }
 
     public bool Equals(FlexibilityStation other)
         => GroupName == other.GroupName && StationNumber == other.StationNumber;
@@ -49,95 +49,74 @@ namespace BlackMaple.SeedTactics.Scheduling
         => (GroupName.GetHashCode(), StationNumber.GetHashCode()).GetHashCode();
   }
 
-  [DataContract]
   public class FlexRouteStop
   {
-    [DataMember(IsRequired = true)]
-    public string MachineGroup { get; set; }
+    public string MachineGroup { get; set; } = "MC";
 
-    [DataMember(IsRequired = true)]
-    public string Program { get; set; }
+    public string Program { get; set; } = "";
 
-    [DataMember(IsRequired = false, EmitDefaultValue = false)]
     public long? Revision { get; set; }
 
-    [DataMember(IsRequired = true)]
     public HashSet<int> Machines { get; private set; } = new HashSet<int>();
 
-    [DataMember(IsRequired = false, EmitDefaultValue = false)]
-    public TimeSpan ExpectedCycleTime { get; set; }
+    public TimeSpan? ExpectedCycleTime { get; set; }
   }
 
-  [DataContract]
   public class FlexPath
   {
-    [DataMember(IsRequired = true)]
     public HashSet<int> LoadStations { get; private set; } = new HashSet<int>();
 
-    [DataMember(IsRequired = true)]
     public TimeSpan ExpectedLoadTime { get; set; }
 
-    [DataMember(IsRequired = true)]
     public IList<FlexRouteStop> Stops { get; private set; } = new List<FlexRouteStop>();
 
-    [DataMember(IsRequired = true)]
     public HashSet<int> UnloadStations { get; private set; } = new HashSet<int>();
 
-    [DataMember(IsRequired = true)]
     public TimeSpan ExpectedUnloadTime { get; set; }
 
-    [DataMember(IsRequired = true)]
-    public HashSet<string> Pallets { get; private set; } = new HashSet<string>();
+    public HashSet<int> Pallets { get; private set; } = new HashSet<int>();
 
-    [DataMember(IsRequired = true)]
-    public string Fixture { get; set; }
+    public string? Fixture { get; set; }
 
-    [DataMember(IsRequired = true)]
     public int Face { get; set; }
 
-    [DataMember(IsRequired = true)]
     public int QuantityOnFace { get; set; }
 
     // Optional input queue. If given, only allow loading when the queue contains a
     // piece of material.
-    [DataMember(IsRequired = false, EmitDefaultValue = false)]
-    public string InputQueue { get; set; }
+    public string? InputQueue { get; set; }
 
     // Optional output queue.  If given, place completed material into this queue
     // and also do not unload if the queue is full.
-    [DataMember(IsRequired = false, EmitDefaultValue = false)]
-    public string OutputQueue { get; set; }
+    public string? OutputQueue { get; set; }
   }
 
-  [DataContract]
   public class FlexInspection
   {
-    [DataMember(IsRequired = true)]
-    public string InspectionType { get; set; }
+    public string InspectionType { get; set; } = "Default";
 
     //There are three possible ways of triggering an exception: counts, random, and time interval.
     // The system maintains a database of counters which consist of an Id, a part completed count, and
     // the time of the last triggered inspection.  The CounterIdTemplate is used at the time a part
     // is completed; the template is replaced with the specific pallets and machines for the just completed
     // part to find the counter to use.
-    [DataMember(IsRequired = true)] public string CounterIdTemplate { get; set; }
+    public string CounterIdTemplate { get; set; } = StationFormatFlag(1, 1);
 
     // Each time a part is completed, the counter is incremented and if it reaches a given value an inspection
     // is triggered and the counter is reset to zero.  Multiple parts could share the same counter, or a single
     // part could use multiple counters via replacement strings.
-    [DataMember(IsRequired = true)] public int MaxVal { get; set; }
+    public int MaxVal { get; set; }
 
     // Each time a part is completed, the counter is checked for the time of the last inspection.  If
     // the given amount of time has passed, the inspection is triggered.
     // This can be disabled by using TimeSpan.Zero
-    [DataMember(IsRequired = true)] public TimeSpan TimeInterval { get; set; }
+    public TimeSpan? TimeInterval { get; set; }
 
     // If this is non-zero, the part is inspected with the given frequency (number between 0 and 1).  Nothing
     // about counters or time is used, this is purely memoryless Bernoulli process.
-    [DataMember(IsRequired = true)] public double RandomFreq { get; set; }
+    public double? RandomFreq { get; set; }
 
-    [DataMember(IsRequired = true)]
-    public TimeSpan ExpectedInspectionTime { get; set; }
+    public TimeSpan? ExpectedInspectionTime { get; set; }
 
     //The final counter string is determined by replacing following substrings in the counter template
     public static string PalletFormatFlag(int proc)
@@ -158,95 +137,72 @@ namespace BlackMaple.SeedTactics.Scheduling
     }
   }
 
-  [DataContract]
   public class FlexProcess
   {
-    [DataMember(IsRequired = true)]
     public int ProcessNumber { get; set; }
 
-    [DataMember(IsRequired = true)]
     public IList<FlexPath> Paths { get; private set; } = new List<FlexPath>();
 
     // inspections which happen after this process is completed.
-    [DataMember(IsRequired = false, EmitDefaultValue = false)]
-    public IList<FlexInspection> Inspections { get; private set; } = new List<FlexInspection>();
+    public IList<FlexInspection>? Inspections { get; set; }
   }
 
-  [DataContract]
   public enum PartReadiness
   {
-    [EnumMember] ProductionReady,
-    [EnumMember] ProveOutOnly
+    ProductionReady,
+    ProveOutOnly
   }
 
-  [DataContract]
   public class FlexPart
   {
-    [DataMember(IsRequired = true)]
-    public string Name { get; set; }
+    public string Name { get; set; } = "part";
 
-    [DataMember(IsRequired = true)]
     public PartReadiness Readiness { get; set; }
 
-    [DataMember(IsRequired = true)]
     public IList<FlexProcess> Processes { get; private set; } = new List<FlexProcess>();
 
-    [DataMember(IsRequired = true)]
     public bool Wash { get; set; }
 
-    [DataMember(IsRequired = false, EmitDefaultValue = false)]
-    public TimeSpan ExpectedWashTime { get; set; }
+    public TimeSpan? ExpectedWashTime { get; set; }
   }
 
-  [DataContract]
   public class FlexLaborTeam
   {
-    [DataMember(IsRequired = true)] public string TeamName { get; set; }
-    [DataMember(IsRequired = true)] public int NumberOfOperators { get; set; }
-    [DataMember(IsRequired = true)] public IList<int> LoadStations { get; set; }
+    public string TeamName { get; set; } = "team";
+    public int NumberOfOperators { get; set; }
+    public IList<int> LoadStations { get; set; } = new List<int>();
   }
 
-  [DataContract]
   public class FlexQueueSize
   {
     //once an output queue grows to this size, stop unloading parts
     //and keep them in the buffer inside the cell
-    [DataMember(IsRequired = false, EmitDefaultValue = false)]
     public int? MaxSizeBeforeStopUnloading { get; set; }
   }
 
-  [DataContract]
   public class FlexPlan
   {
     ///All the parts in the flexibility plan
-    [DataMember(IsRequired = true)]
     public IList<FlexPart> Parts { get; private set; } = new List<FlexPart>();
 
     ///All the labor teams which are assigned to stations.  If the list is empty, it is assumed
     ///that each station has a dedicated labor operator.
-    [DataMember(IsRequired = true)]
     public IList<FlexLaborTeam> LaborTeams { get; private set; } = new List<FlexLaborTeam>();
 
     ///Queue sizes (if in-process queues are used)
-    [DataMember(IsRequired = true)]
     public IDictionary<string, FlexQueueSize> QueueSizes { get; private set; } = new Dictionary<string, FlexQueueSize>();
 
     ///Cell efficiency as a percentage between 0 and 1
-    [DataMember(IsRequired = true)]
     public double CellEfficiency { get; set; } = 1.0;
 
     ///Travel time of the cart between two points (average)
-    [DataMember(IsRequired = true)]
     public TimeSpan ExpectedCartTravelTime { get; set; } = TimeSpan.FromMinutes(1);
 
     ///Time for a rotary swap from machine queue to machine worktable
-    [DataMember(IsRequired = true)]
     public TimeSpan ExpectedRotarySwapTime { get; set; } = TimeSpan.FromMinutes(0.5);
 
-    [DataMember(IsRequired = false, EmitDefaultValue = false)]
-    public string SeedtacticPlanningToken { get; set; }
+    public string? SeedtacticPlanningToken { get; set; }
 
-    [DataMember(IsRequired = false, EmitDefaultValue = false)]
-    public string OriginalMastModelFileName { get; set; }
+    public string? OriginalMastModelFileName { get; set; }
   }
 }
