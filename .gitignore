@@ -3,3 +3,4 @@
 **/obj/
 notebooks/.ipynb_checkpoints/
 notebooks/__pycache__/
+.mypy_cache/
