@@ -88,6 +88,7 @@ namespace BlackMaple.SeedTactics.Scheduling
     public IEnumerable<SimulatedStationUtilization> SimStations { get; set; } = Enumerable.Empty<SimulatedStationUtilization>();
     public IReadOnlyDictionary<string, int> NewExtraParts { get; set; } = new Dictionary<string, int>();
     public IReadOnlyDictionary<string, QueueSize> QueueSizes { get; set; } = new Dictionary<string, QueueSize>();
+    public IEnumerable<SimulatedStationUtilization>? SimStationsForExecutionOfCurrentStatus { get; set; }
     public IReadOnlyDictionary<string, string>? DebugData { get; set; }
   }
 
