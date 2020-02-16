@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser(description="Allocate and Download")
 parser.add_argument("-f", "--flex", dest="flexplan", type=str, required=True)
 parser.add_argument("-p", "--plugin", dest="plugin", type=str, required=True)
 parser.add_argument("-d", "--download", dest="download", type=str)
+parser.add_argument("--new-jobs", dest="newjobs", action="store_true")
 parser.add_argument("-v", "--verbose", dest="verbose", action="store_true")
 parser.add_argument("--program-dir", dest="programs", type=str)
 parser.add_argument(
@@ -108,20 +109,21 @@ if proc.returncode != 0:
 
 response = json.loads(proc.stdout)
 
+newjobs = {
+    "ScheduleId": response["Jobs"][0]["ScheduleId"],
+    "Jobs": response["Jobs"],
+    "StationUse": response["SimStations"],
+    "ExtraParts": response["NewExtraParts"],
+    "CurrentUnfilledWorkorders": [],
+    "QueueSizes": response["QueueSizes"],
+    "Programs": progentries,
+    "ArchiveCompletedJobs": True,
+}
+
+
 if args.download:
     if args.verbose:
         print(json.dumps(response, indent=2))
-
-    newjobs = {
-        "ScheduleId": response["Jobs"][0]["ScheduleId"],
-        "Jobs": response["Jobs"],
-        "StationUse": response["SimStations"],
-        "ExtraParts": response["NewExtraParts"],
-        "CurrentUnfilledWorkorders": [],
-        "QueueSizes": response["QueueSizes"],
-        "Programs": progentries,
-        "ArchiveCompletedJobs": True,
-    }
     req = urllib.request.Request(
         args.download + "/api/v1/jobs/add?expectedPreviousScheduleId=",
         json.dumps(newjobs).encode("utf-8"),
@@ -129,6 +131,7 @@ if args.download:
         method="POST",
     )
     print(urllib.request.urlopen(req).read().decode())
-
+elif args.newjobs:
+    print(json.dumps(newjobs, indent=2))
 else:
     print(json.dumps(response, indent=2))
