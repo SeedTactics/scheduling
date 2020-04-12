@@ -89,6 +89,10 @@ namespace BlackMaple.SeedTactics.Scheduling
     // Optional output queue.  If given, place completed material into this queue
     // and also do not unload if the queue is full.
     public string? OutputQueue { get; set; }
+
+    // Option casting (only for process = 1).  If given, the input queue is searched
+    // for castings matching the given name
+    public string? Casting { get; set; }
   }
 
   public class FlexInspection
