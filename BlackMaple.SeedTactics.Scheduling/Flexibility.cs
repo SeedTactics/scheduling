@@ -93,6 +93,9 @@ namespace BlackMaple.SeedTactics.Scheduling
     // Option casting (only for process = 1).  If given, the input queue is searched
     // for castings matching the given name
     public string? Casting { get; set; }
+
+    // inspections which happen after this path is completed.
+    public IList<FlexInspection>? Inspections { get; set; }
   }
 
   public class FlexInspection
@@ -168,6 +171,8 @@ namespace BlackMaple.SeedTactics.Scheduling
     public bool Wash { get; set; }
 
     public TimeSpan? ExpectedWashTime { get; set; }
+
+    public string? GroupColor { get; set; }
   }
 
   public class FlexLaborTeam
@@ -184,6 +189,32 @@ namespace BlackMaple.SeedTactics.Scheduling
     public int? MaxSizeBeforeStopUnloading { get; set; }
   }
 
+  public enum FlexForecastHorizonLength
+  {
+    FourWeeks,
+    TwentySixWeeks,
+    FiftyTwoWeeks
+  }
+
+  public class FlexForecastHorizon
+  {
+    public int HoursPerDay { get; set; } = 24;
+    public int DaysPerWeek { get; set; } = 7;
+    public FlexForecastHorizonLength Length { get; set; } = FlexForecastHorizonLength.TwentySixWeeks;
+  }
+
+  public class FlexForecastPart
+  {
+    public int Quantity { get; set; } = 0;
+    public int? Priority { get; set; }
+  }
+
+  public class FlexForecastDemand
+  {
+    public FlexForecastHorizon Horizon = new FlexForecastHorizon();
+    public IDictionary<string, FlexForecastPart> Parts = new Dictionary<string, FlexForecastPart>();
+  }
+
   public class FlexPlan
   {
     ///All the parts in the flexibility plan
@@ -195,6 +226,19 @@ namespace BlackMaple.SeedTactics.Scheduling
 
     ///Queue sizes (if in-process queues are used)
     public IDictionary<string, FlexQueueSize> QueueSizes { get; private set; } = new Dictionary<string, FlexQueueSize>();
+
+    ///Maps kanban names to a list of pallet numbers
+    public IDictionary<string, IList<int>>? Kanbans { get; set; }
+
+    public FlexForecastDemand? ForecastDemand { get; set; }
+
+    public int? NumLoadStations { get; set; }
+
+    ///Maps a machine group to the quantity of machines
+    public IDictionary<string, int>? NumMachines { get; set; }
+
+    ///The list of machine groups in-order of stops (repeats are allowed)
+    public IList<string>? MachineRouting { get; set; }
 
     ///Cell efficiency as a percentage between 0 and 1
     public double CellEfficiency { get; set; } = 1.0;
