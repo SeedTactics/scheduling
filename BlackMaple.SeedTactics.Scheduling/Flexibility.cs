@@ -189,32 +189,6 @@ namespace BlackMaple.SeedTactics.Scheduling
     public int? MaxSizeBeforeStopUnloading { get; set; }
   }
 
-  public enum FlexForecastHorizonLength
-  {
-    FourWeeks,
-    TwentySixWeeks,
-    FiftyTwoWeeks
-  }
-
-  public class FlexForecastHorizon
-  {
-    public int HoursPerDay { get; set; } = 24;
-    public int DaysPerWeek { get; set; } = 7;
-    public FlexForecastHorizonLength Length { get; set; } = FlexForecastHorizonLength.TwentySixWeeks;
-  }
-
-  public class FlexForecastPart
-  {
-    public int Quantity { get; set; } = 0;
-    public int? Priority { get; set; }
-  }
-
-  public class FlexForecastDemand
-  {
-    public FlexForecastHorizon Horizon = new FlexForecastHorizon();
-    public IDictionary<string, FlexForecastPart> Parts = new Dictionary<string, FlexForecastPart>();
-  }
-
   public class FlexPlan
   {
     ///All the parts in the flexibility plan
@@ -229,8 +203,6 @@ namespace BlackMaple.SeedTactics.Scheduling
 
     ///Maps kanban names to a list of pallet numbers
     public IDictionary<string, IList<int>>? Kanbans { get; set; }
-
-    public FlexForecastDemand? ForecastDemand { get; set; }
 
     public int? NumLoadStations { get; set; }
 
