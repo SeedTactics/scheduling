@@ -80,6 +80,8 @@ namespace BlackMaple.SeedTactics.Scheduling
     public BookingFillMethod FillMethod { get; set; } = BookingFillMethod.FillInAnyOrder;
 
     public IEnumerable<StationDowntime>? Downtimes { get; set; }
+
+    public bool? SeparateSchedulePerDay { get; set; }
   }
 
   public class AllocateResult
