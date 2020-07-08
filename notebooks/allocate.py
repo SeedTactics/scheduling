@@ -4,10 +4,10 @@ import subprocess
 import json
 import urllib
 import os
-import plotly.figure_factory as ff
-import plotly.graph_objs as go
+import matplotlib.pyplot as plt
 
-# Compied and modified from https://github.com/pandas-dev/pandas/pull/19065 until new pandas release
+# Compied and modified from https://github.com/pandas-dev/pandas/pull/19065
+# The merged code doesn't allow optional days
 iso_pater = re.compile(r"""P
                         (?:(?P<days>-?[0-9]*)D)?
                         T
@@ -38,7 +38,7 @@ def parse_iso_format_string(iso_fmt):
                          "{}".format(iso_fmt))
     return t
 
-def encode_bookings(bookings, prev_parts):
+def encode_bookings(bookings):
     blst = []
     for b in bookings.groupby("BookingId"):
         blst.append({"BookingId":b[0],
@@ -46,7 +46,7 @@ def encode_bookings(bookings, prev_parts):
                      "Priority":b[1]["Priority"].iloc[0].item(),
                      "Parts": [{"BookingId":b[0], "Part":p["Part"], "Quantity":p["Quantity"]}
                                for _,p in b[1].iterrows()]})
-    return json.dumps({"UnscheduledBookings": blst, "ScheduledParts": prev_parts})
+    return blst
 
 def encode_bookings_as_workorders(bookings):
     if bookings is None: return []
@@ -76,85 +76,58 @@ def print_result_summary(results):
                 print("            Loads {}".format(",".join([str(l) for l in path["Load"]])))
                 stops = []
                 for s in path["Stops"]:
-                    stops.append(",".join([s["StationGroup"] + n for n in s["Stations"].keys()]))
+                    stops.append(",".join([s["StationGroup"] + str(n) for n in s["StationNums"]]))
                 print("            Stops {}".format("->".join(stops)))
                 print("            Unload {}".format(",".join([str(u) for u in path["Unload"]])))
                 pathCntr += 1
             procCntr += 1
 
-def allocate(bookings, flex_file, plugin, allocatecli, prev_parts=[], downtimes=[], start_utc=None, end_utc=None, schid=None):
-    bookings_json = encode_bookings(bookings, prev_parts)
-    downtime_json = json.dumps(downtimes)
-    args =[ "dotnet", "run", "-p", allocatecli, "--",
-           "-f", flex_file, "-p", plugin, "--downtimes", downtime_json
-          ]
-    if start_utc != None:
-        args.append("--start")
-        args.append(start_utc)
-    if end_utc != None:
-        args.append("--end")
-        args.append(end_utc)
-    if schid != None:
-        args.append("--schid")
-        args.append(schid)
-    env = os.environ.copy()
-    env["TERM"] = "xterm"
-    print("Running " + str(args))
-    proc = subprocess.run(args=args,
-                          input=bookings_json,
-                          encoding="utf-8",
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE,
-                          env=env)
+def allocate(bookings, flex_file, plugin, prev_parts=[], downtimes=[], start_utc=None, end_utc=None, schid=None):
+    with open(flex_file) as f:
+        flexplan = json.load(f)
+
+    request = {
+        "ScheduleId": None,
+        "StartUTC": start_utc.isoformat() if start_utc else "2016-11-05T01:00:00Z",
+        "EndUTC": end_utc.isoformat() if end_utc else "2016-11-06T01:00:00Z",
+        "UnscheduledBookings": encode_bookings(bookings),
+        "ScheduledParts": prev_parts,
+        "FlexPlan": flexplan,
+        "FillMethod": "FillInAnyOrder",
+        "Downtimes": downtimes
+    }
+
+    proc = subprocess.run(
+        ["dotnet", "run", "--framework", "netcoreapp3.1", "-p", plugin],
+        input=json.dumps(request),
+        text=True,
+        stdout=subprocess.PIPE,
+    )
+
     if proc.stderr != "":
         print(proc.stderr)
     if proc.returncode != 0:
         raise Exception()
+
     results_json = proc.stdout
     results = json.loads(results_json)
-    results["OriginalJson"] = results_json
-    return results
-
-def newjobs(results, bookings=None):
-    newJobs = {
-      "Jobs": results["Jobs"],
-      "StationUse": results["SimStations"],
-      "ExtraParts": {},
-      "ArchiveCompletedJobs": True,
-      "ScheduleId": results["ScheduleId"],
-      "QueueSizes": results["QueueSizes"],
-      "CurrentUnfilledWorkorders": encode_bookings_as_workorders(bookings)
+    results["NewJobs"] = {
+        "ScheduleId": results["Jobs"][0]["ScheduleId"],
+        "Jobs": results["Jobs"],
+        "StationUse": results["SimStations"],
+        "ExtraParts": results["NewExtraParts"],
+        "CurrentUnfilledWorkorders": [],
+        "QueueSizes": results["QueueSizes"],
+        "ArchiveCompletedJobs": True,
+        "CurrentUnfilledWorkorders": encode_bookings_as_workorders(bookings)
     }
-    for p in results["NewExtraParts"]:
-        newJobs["ExtraParts"][p["Part"]] = p["Quantity"]
-    return newJobs
 
-def download(results, computer, bookings=None):
-    newJobs = newjobs(results, bookings)
-    req = urllib.request.Request(url="http://" + computer + "/api/v1/jobs/add",
-                                 data=json.dumps(newJobs).encode('utf-8'),
-                                 headers={'content-type': 'application/json'},
-                                 method='POST')
-    urllib.request.urlopen(req)
-
-def simstat(results):
     simstat = pd.DataFrame(results["SimStations"])
     simstat["StartUTC"] = pd.to_datetime(simstat["StartUTC"])
     simstat["EndUTC"] = pd.to_datetime(simstat["EndUTC"])
     simstat["PlannedDownTime"] = simstat["PlannedDownTime"].apply(parse_iso_format_string)
     simstat["UtilizationTime"] = simstat["UtilizationTime"].apply(parse_iso_format_string)
-    #simstat["PlannedDownTime"] = pd.to_timedelta(simstat["PlannedDownTime"])
-    #simstat["UtilizationTime"] = pd.to_timedelta(simstat["UtilizationTime"])
-    return simstat
 
-def plot_simstat(simstat):
-    s = simstat.copy()
-    s["Task"] = s["StationGroup"] + s["StationNum"].apply(str)
-    s["Start"] = s["StartUTC"]
-    s["Finish"] = s["EndUTC"]
-    return ff.create_gantt(s, index_col="StationGroup", group_tasks=True)
-
-def simprod(results):
     simprod = pd.DataFrame()
     for j in results["Jobs"]:
         procCntr = 1
@@ -168,23 +141,52 @@ def simprod(results):
                 simprod = simprod.append(p)
                 pathCntr += 1
             procCntr += 1
-    return simprod
+
+    return results, simstat, simprod
+
+def download(results, computer):
+    req = urllib.request.Request(url="http://" + computer + "/api/v1/jobs/add",
+                                 data=json.dumps(results["NewJobs"]).encode('utf-8'),
+                                 headers={'content-type': 'application/json'},
+                                 method='POST')
+    urllib.request.urlopen(req)
+
+def plot_simstat(simstat):
+    plt.figure()
+    i = 0
+    start = simstat["StartUTC"].min()
+    cmap = plt.cm.get_cmap("hsv", 10)
+    stations = []
+    for stat, group in simstat.groupby(["StationGroup", "StationNum"]):
+        x = [
+            ((s - start).total_seconds() / 60, (e - s).total_seconds() / 60)
+            for (s, e) in zip(group["StartUTC"], group["EndUTC"])
+        ]
+        plt.broken_barh(xranges=x, yrange=(i * 10, 5), label=stat, color=cmap(i))
+        stations.append(stat)
+        i += 1
+    plt.gca().legend(ncol=len(stat), bbox_to_anchor=(0, 1), loc="lower left")
+    plt.show()
 
 def plot_simprod(results):
-    plots = []
+    plt.figure()
+    ax = plt.gca()
     for j in results["Jobs"]:
         procCntr = 1
         for proc in j["ProcsAndPaths"]:
             pathCntr = 0
             for path in proc["paths"]:
                 p = pd.DataFrame(path["SimulatedProduction"])
-                plots.append(go.Scatter(
-                    x=p["TimeUTC"],
-                    y=p["Quantity"],
-                    name=j["PartName"] + " " + str(procCntr) + ":" + str(pathCntr)))
+                p["TimeUTC"] = pd.to_datetime(p["TimeUTC"])
+                p.plot(
+                    ax=ax,
+                    x="TimeUTC",
+                    y="Quantity",
+                    label=j["PartName"] + " " + str(procCntr) + ":" + str(pathCntr),
+                )
                 pathCntr += 1
             procCntr += 1
-    return plots
+    plt.show()
 
 def create_scenario(results, bookings, path, prev_parts=[], downtimes=[]):
     if not os.path.exists(path):
