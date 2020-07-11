@@ -87,7 +87,7 @@ def allocate(bookings, flex_file, plugin, prev_parts=[], downtimes=[], start_utc
         flexplan = json.load(f)
 
     request = {
-        "ScheduleId": None,
+        "ScheduleId": schid,
         "StartUTC": start_utc.isoformat() if start_utc else "2016-11-05T01:00:00Z",
         "EndUTC": end_utc.isoformat() if end_utc else "2016-11-06T01:00:00Z",
         "UnscheduledBookings": encode_bookings(bookings),
