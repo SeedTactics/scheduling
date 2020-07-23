@@ -24,8 +24,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlackMaple.FMSInsight.API" Version="1.13.5" />
-    <PackageReference Include="BlackMaple.SeedOrders" Version="5.2.2" />
+    <PackageReference Include="BlackMaple.FMSInsight.API" Version="1.14.0" />
+    <PackageReference Include="BlackMaple.SeedOrders" Version="6.0.0" />
 
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
   </ItemGroup>

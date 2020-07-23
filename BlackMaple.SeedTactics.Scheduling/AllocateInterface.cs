@@ -73,8 +73,6 @@ namespace BlackMaple.SeedTactics.Scheduling
 
     public IEnumerable<SeedOrders.ScheduledPartWithoutBooking>? ScheduledParts { get; set; }
 
-    public IEnumerable<SeedOrders.Casting>? AvailableCastings { get; set; }
-
     public FlexPlan FlexPlan { get; set; } = new FlexPlan();
 
     public BookingFillMethod FillMethod { get; set; } = BookingFillMethod.FillInAnyOrder;
