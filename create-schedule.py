@@ -63,6 +63,7 @@ if args.programs:
         progentries.append(
             {
                 "ProgramName": p.stem,
+                "Revision": -1,
                 "Comment": "Comment for " + p.stem,
                 "ProgramContent": "\n".join(lines[1:]),
             }
