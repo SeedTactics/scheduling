@@ -15,7 +15,7 @@ parser.add_argument("-p", "--plugin", dest="plugin", type=str, required=True)
 parser.add_argument("-d", "--download", dest="download", type=str)
 parser.add_argument("--new-jobs", dest="newjobs", action="store_true")
 parser.add_argument("-v", "--verbose", dest="verbose", action="store_true")
-parser.add_argument("--program-dir", dest="programs", type=str)
+parser.add_argument("--programs", dest="programs", type=str)
 parser.add_argument(
     "--start",
     dest="startTime",
@@ -47,25 +47,24 @@ request = {
 mainprogs: Dict[str, List] = {}
 progentries = []
 if args.programs:
-    for f in os.listdir(args.programs):
-        p = pathlib.Path(os.path.join(args.programs, f))
-        with open(p) as f:
-            lines = f.read().splitlines()
-        [part, proc, mc] = lines[0].split(",")
+    with open(args.programs) as f:
+        raw_programs = json.load(f)
+    for p in raw_programs:
+        part = p["PartName"]
         if part in mainprogs:
             mainprogs[part].append(
-                {"ProcessNumber": proc, "MachineGroup": mc, "ProgramName": p.stem}
+                {"ProcessNumber": p["ProcessNumber"], "MachineGroup": p["MachineGroup"], "ProgramName": p["ProgramName"], "StopIndex": p["StopIndex"] if "StopIndex" in p else None}
             )
         else:
             mainprogs[part] = [
-                {"ProcessNumber": proc, "MachineGroup": mc, "ProgramName": p.stem}
+                {"ProcessNumber": p["ProcessNumber"], "MachineGroup": p["MachineGroup"], "ProgramName": p["ProgramName"], "StopIndex": p["StopIndex"] if "StopIndex" in p else None}
             ]
         progentries.append(
             {
-                "ProgramName": p.stem,
-                "Revision": -1,
-                "Comment": "Comment for " + p.stem,
-                "ProgramContent": "\n".join(lines[1:]),
+                "ProgramName": p["ProgramName"],
+                "Revision": p["Revision"],
+                "Comment": p["Comment"],
+                "ProgramContent": p["ProgramContent"],
             }
         )
 
