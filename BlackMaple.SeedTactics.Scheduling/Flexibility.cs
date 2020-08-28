@@ -206,8 +206,8 @@ namespace BlackMaple.SeedTactics.Scheduling
 
     public int? NumLoadStations { get; set; }
 
-    ///Maps a machine group to the quantity of machines
-    public IDictionary<string, int>? NumMachines { get; set; }
+    ///Maps a machine group to the machine numbers for that group
+    public IDictionary<string, IList<int>>? MachineNumbers { get; set; }
 
     ///The list of machine groups in-order of stops (repeats are allowed)
     public IList<string>? MachineRouting { get; set; }
