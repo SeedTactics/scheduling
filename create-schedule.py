@@ -26,18 +26,34 @@ parser.add_argument(
     dest="endTime",
     type=lambda d: datetime.datetime.strptime(d, "%Y%m%d %H%M%S"),
 )
+parser.add_argument(
+    "--today",
+    dest="today",
+    action="store_true"
+)
 parser.add_argument("parts", nargs="+", type=str)
 args = parser.parse_args()
 
 with open(args.flexplan) as f:
     flexplan = json.load(f)
 
+startTime = datetime.datetime(2016, 11, 5, 1, 0, 0)
+endTime = None
+
+if args.today:
+    startTime = datetime.datetime.utcnow() + datetime.timedelta(hours=-10)
+    endTime = startTime + datetime.timedelta(hours = 24)
+elif args.startTime and args.endTime:
+    startTime = args.startTime
+    endTime = args.endTime
+
+if not endTime:
+    endTime = startTime + datetime.timedelta(hours = 24)
+
 request = {
     "ScheduleId": None,
-    "StartUTC": args.startTime.isoformat()
-    if args.startTime
-    else "2016-11-05T01:00:00Z",
-    "EndUTC": args.endTime.isoformat() if args.endTime else "2016-11-06T01:00:00Z",
+    "StartUTC": startTime.isoformat() + "Z",
+    "EndUTC": endTime.isoformat() + "Z",
     "UnscheduledBookings": [],
     "ScheduledParts": [],
     "FlexPlan": flexplan,
