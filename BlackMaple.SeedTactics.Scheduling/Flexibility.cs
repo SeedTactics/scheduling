@@ -149,9 +149,6 @@ namespace BlackMaple.SeedTactics.Scheduling
     public int ProcessNumber { get; set; }
 
     public IList<FlexPath> Paths { get; private set; } = new List<FlexPath>();
-
-    // obsolete per-process inspections, keep until allocate API is updated everywhere
-    public IList<FlexInspection>? Inspections { get; set; }
   }
 
   public enum PartReadiness
