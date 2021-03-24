@@ -222,4 +222,53 @@ namespace BlackMaple.SeedTactics.Scheduling
 
     public string? OriginalMastModelFileName { get; set; }
   }
+
+  public class FlexOrder
+  {
+    public string Part { get; set; } = "";
+    public int Quantity { get; set; } = 0;
+    public int Priority { get; set; } = 0;
+    public DateTime DueDate { get; set; } = DateTime.Today;
+  }
+
+  public class FlexOrderSnapshot
+  {
+    public DateTime SnapshotDate { get; set; }
+    public string Description { get; set; } = "";
+    public IList<FlexOrder> Orders { get; set; } = new List<FlexOrder>();
+  }
+
+  public enum FlexForecastHorizonLength
+  {
+    FourWeeks,
+    TwentySixWeeks,
+    FiftyTwoWeeks
+  }
+
+  public class FlexForecastHorizon
+  {
+    public int HoursPerDay { get; set; } = 24;
+    public int DaysPerWeek { get; set; } = 7;
+    public FlexForecastHorizonLength Length { get; set; } = FlexForecastHorizonLength.FourWeeks;
+  }
+
+  public class FlexForecastPartDemand
+  {
+    public int Quantity { get; set; }
+    public int? Priority { get; set; }
+  }
+
+  public class FlexForecastDemand
+  {
+    public FlexForecastHorizon Horizon { get; set; } = new FlexForecastHorizon();
+    public IDictionary<string, FlexForecastPartDemand> Parts { get; set; } = new Dictionary<string, FlexForecastPartDemand>();
+  }
+
+  public class FlexProject : FlexPlan
+  {
+    public IList<FlexOrderSnapshot>? OrderSnapshots { get; set; }
+    public FlexForecastDemand? ForecastDemand { get; set; }
+    public string? BuiltinAllocationAlgorithm { get; set; }
+    public string? PathToCustomPlugin { get; set; }
+  }
 }
