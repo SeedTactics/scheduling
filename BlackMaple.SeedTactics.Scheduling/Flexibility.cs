@@ -268,7 +268,11 @@ namespace BlackMaple.SeedTactics.Scheduling
   {
     public IList<FlexOrderSnapshot>? OrderSnapshots { get; set; }
     public FlexForecastDemand? ForecastDemand { get; set; }
-    public string? BuiltinAllocationAlgorithm { get; set; }
-    public string? PathToCustomPlugin { get; set; }
+    public string? AllocationAlgorithm { get; set; }
+    public string? PathToCustomAllocationPlugin { get; set; }
+
+    public bool? UseCustomOrderPlugin { get; set; }
+    public string? PathToCustomOrderPlugin { get; set; }
+    public string? PathToOrderCSVFile { get; set; }
   }
 }
