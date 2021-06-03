@@ -84,7 +84,7 @@ namespace BlackMaple.SeedTactics.Scheduling
 
   public class AllocateResult
   {
-    public IEnumerable<JobPlan> Jobs { get; set; } = Enumerable.Empty<JobPlan>();
+    public IEnumerable<Job> Jobs { get; set; } = Enumerable.Empty<Job>();
     public IEnumerable<SimulatedStationUtilization> SimStations { get; set; } = Enumerable.Empty<SimulatedStationUtilization>();
     public IReadOnlyDictionary<string, int> NewExtraParts { get; set; } = new Dictionary<string, int>();
     public IReadOnlyDictionary<string, QueueSize> QueueSizes { get; set; } = new Dictionary<string, QueueSize>();
