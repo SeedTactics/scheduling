@@ -179,13 +179,6 @@ namespace BlackMaple.SeedTactics.Scheduling
     public IList<int> LoadStations { get; set; } = new List<int>();
   }
 
-  public class FlexQueueSize
-  {
-    //once an output queue grows to this size, stop unloading parts
-    //and keep them in the buffer inside the cell
-    public int? MaxSizeBeforeStopUnloading { get; set; }
-  }
-
   public class FlexPlan
   {
     ///All the parts in the flexibility plan
@@ -194,9 +187,6 @@ namespace BlackMaple.SeedTactics.Scheduling
     ///All the labor teams which are assigned to stations.  If the list is empty, it is assumed
     ///that each station has a dedicated labor operator.
     public IList<FlexLaborTeam> LaborTeams { get; private set; } = new List<FlexLaborTeam>();
-
-    ///Queue sizes (if in-process queues are used)
-    public IDictionary<string, FlexQueueSize> QueueSizes { get; private set; } = new Dictionary<string, FlexQueueSize>();
 
     ///Maps kanban names to a list of pallet numbers
     public IDictionary<string, IList<int>>? Kanbans { get; set; }
