@@ -40,15 +40,6 @@ using BlackMaple.FMSInsight.API;
 
 namespace BlackMaple.SeedTactics.Scheduling
 {
-  ///Marks that a collection of stations is down for a given time period during the allocation.
-  public class StationDowntime
-  {
-    public DateTime StartOfDowntimeUTC { get; set; }
-    public DateTime EndOfDowntimeUTC { get; set; }
-    ///An empty list means the entire cell - all stations
-    public IReadOnlyCollection<FlexibilityStation>? Station { get; set; }
-  }
-
   public enum BookingFillMethod
   {
     FillInAnyOrder,
@@ -76,8 +67,6 @@ namespace BlackMaple.SeedTactics.Scheduling
     public FlexPlan FlexPlan { get; set; } = new FlexPlan();
 
     public BookingFillMethod FillMethod { get; set; } = BookingFillMethod.FillInAnyOrder;
-
-    public IEnumerable<StationDowntime>? Downtimes { get; set; }
 
     public bool? SeparateSchedulePerDay { get; set; }
   }
